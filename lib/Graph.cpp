@@ -61,7 +61,7 @@ void Graph::print(){
                     visited[*it] = true;
                     s.push(*it);
                 }
-            }   
+            }
         }
     }
     qDebug() << '\n';
@@ -75,7 +75,7 @@ Graph build_tree(QString xml_file){
     QString tag_value = "";
     
     int len = xml_file.length();
-    for (int i = 0; i < len; i++){
+    for (int i = 0; i < len;){
         while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
             if (i < len)
                 i++;
@@ -94,6 +94,8 @@ Graph build_tree(QString xml_file){
             }
             current_tag += xml_file[i++];
             Node* parent = new Node(current_tag.trimmed(), "");
+            if (!tags.empty())
+                tree.add_edge(tags.top(), parent);
             tags.push(parent);
             while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                 if (i < len)
@@ -107,9 +109,11 @@ Graph build_tree(QString xml_file){
                 while(xml_file[i] != '<'){
                     tag_value += xml_file[i++];
                 } // after the content, the closed tag comes so we will pop
+                Node* child = tags.top();
+                child->value = tag_value;
                 tags.pop();
-                Node* child = new Node(current_tag, tag_value);
-                tree.add_edge(tags.top(), child);
+                
+//                tree.add_edge(tags.top(), child);
                 while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                     if (i < len)
                         i++;
@@ -118,12 +122,22 @@ Graph build_tree(QString xml_file){
                         break;
                     }
                 }           
-            } else if (xml_file[i] == '<' && xml_file[i + 1] == '/'){
-                tags.pop();
             }
 
         }
-        
+        if (xml_file[i] == '<' && xml_file[i + 1] == '/'){
+            QString closed_tag = "";
+            while(xml_file[i] != '>'){
+                if (xml_file[i] == '/'){
+                    i++;
+                    continue;
+                }
+                closed_tag += xml_file[i++];
+            }
+            closed_tag += xml_file[i++];
+            if (closed_tag == tags.top()->name)
+                tags.pop();
+        }
     }
     return tree;
 }
