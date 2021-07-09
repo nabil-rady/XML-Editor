@@ -10,20 +10,18 @@ CONFIG += c++11
 
 SOURCES += \
     main.cpp \
-    xml_editor.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    xml_editor.h
+    mainwindow.h
 
 FORMS += \
-    xml_editor.ui
-
-TRANSLATIONS += \
-    XML-Editor_en_150.ts
-CONFIG += lrelease
-CONFIG += embed_translations
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    res.qrc
