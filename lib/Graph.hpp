@@ -1,15 +1,14 @@
 #pragma once 
-#include <list>
-#include <unordered_map>
-
-template <typename T>
+#include <QList>
+#include <QHash>
+#include <QString>
 class Graph{
     int n;
-    T root;
-    std::unordered_map<T, std::list<T>> adj;
+    QString root;
+    QHash<QString, QList<QString>> adj;
 public:
     Graph();
-    void add_edge(T from, T to);
+    void add_edge(QString from, QString to);
     void print();
 };
 
