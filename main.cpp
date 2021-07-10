@@ -50,8 +50,8 @@ int main(int argc, char *argv[])
     // t.add_edge(d,g);
 //    t.print();
     QString value = "";
-//    qDebug().noquote() << t.convert_to_json(t.get_root(), 1, value, true);
-    qDebug().noquote() << t.beautify_xml(t.get_root(), 0, value);
+    qDebug().noquote() << t.convert_to_json(t.get_root(), 1, value, true);
+//    qDebug().noquote() << t.beautify_xml(t.get_root(), 0, value);
     // delete aa;
     // delete b;
     // delete c;

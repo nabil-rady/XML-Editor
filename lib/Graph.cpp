@@ -142,8 +142,10 @@ QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
             else
                 convert_to_json(*i, tab, s, false);
         }
-        s = s.left(s.length()-2);
-        s += "\n";
+        if(s[s.length()-2] == ','){
+            s = s.left(s.length()-2);
+            s += "\n";
+        }
         for (int i = 0; i < tab; i++)
             s += "\t";
         if(last)
