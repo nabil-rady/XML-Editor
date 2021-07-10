@@ -22,6 +22,10 @@ Graph::~Graph(){
     }
 }
 
+Node* Graph::get_root(){
+    return this->root;
+}
+
 void Graph::add_edge(Node* from, Node* to){
     if(this->n_nodes == 0)
         this->root = from;
@@ -67,29 +71,93 @@ void Graph::print(){
     qDebug() << '\n';
 }
 
-QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level){
+/*
+{
+    "name": "mohamed",
+    "hobbies": {
+        "swimming": "true"
+    }
+}
+*/ 
+
+QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level, bool last){
     QString tab = "";
     for(int i = 0; i < level; i++)
         tab+='\t';
-    json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\"");
+    if (this->adj.find(node) == this->adj.end() || !this->adj[node]){ // leaf node      
+        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\",\n");
+    } else {
+        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("{\n");    
+    }
+    
     visited[node] = true;
-    for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
-        if(visited.find(*it) == visited.end()){
-            _convert_to_json(*it, json, visited, level+1);
+    if(this->adj[node]){
+        for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
+            if(visited.find(*it) == visited.end()){ 
+                if (it + 1 == this->adj[node]->end() && this->adj[node]->size() != 1 ) // Last and not the only one 
+                    this->_convert_to_json(*it, json, visited, level+1, true);
+                else
+                    this->_convert_to_json(*it, json, visited, level+1, false);
+            }
+        }                                                                                                                           
+    }
+    // if last ems7, else mtms74
+    if (!(this->adj.find(node) == this->adj.end() || !this->adj[node])){ //Not a leaf node      
+        if (last){
+            json = json.left(json.length()-2);
+            json += QString("\n") + tab + QString("}\n");
+        } else {
+            json += tab + QString("},\n");
         }
+        // if (json[json.length()-2] == ','){
+        //     json = json.left(json.length()-2);
+        //     json += QString("\n") + tab + QString("}\n");
+        // } else {
+        //     json += tab + QString("}\n");
+        // }
+
     }
     return json;
 }
 
-QString Graph::convert_to_json(){
-    QHash<Node*, bool> visited;
-    QString json = "{\n";
-    return this->_convert_to_json(this->root, json, visited, 1) + "\n}";
+//QString Graph::convert_to_json(){
+//    QHash<Node*, bool> visited;
+//    QString json = "{\n";
+//    return this->_convert_to_json(this->root, json, visited, 1, true) + QString("}");
+//}
+
+QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
+    for (int i = 0; i < tab; i++)
+        s += "\t";
+    s += "\"" + QString(node->name) + "\": ";
+    if(node->value != ""){
+        s += "\"" + QString(node->value) + "\",\n";
+    } else if (this->adj[node]){
+        tab++;
+        s += "{\n";
+        for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
+            if ((i+1) == this->adj[node]->end())
+                convert_to_json(*i, tab, s, true);
+            else
+                convert_to_json(*i, tab, s, false);
+        }
+        s = s.left(s.length()-2);
+        s += "\n";
+        for (int i = 0; i < tab; i++)
+            s += "\t";
+        if(last)
+            s += "}\n";
+        else
+            s += "},\n";
+        tab--;
+    }
+
+    QString json = "{\n" + s;
+    return json + QString("}");
 }
 
 Graph build_tree(QString xml_file){
     Graph tree;
-    //QStack <QString> tags;
     QStack <Node*> tags;
     QString current_tag = "";
     QString tag_value = "";
@@ -110,9 +178,13 @@ Graph build_tree(QString xml_file){
             tag_value = QString("");
            
             while(xml_file[i] != '>'){
+                if (xml_file[i] == '<'){
+                    i++;
+                    continue;
+                }
                 current_tag += xml_file[i++];
             }
-            current_tag += xml_file[i++];
+            i++;
             Node* parent = new Node(current_tag.trimmed(), QString(""));
             if (!tags.empty())
                 tree.add_edge(tags.top(), parent);
@@ -148,13 +220,13 @@ Graph build_tree(QString xml_file){
         if (xml_file[i] == '<' && xml_file[i + 1] == '/'){
             QString closed_tag = "";
             while(xml_file[i] != '>'){
-                if (xml_file[i] == '/'){
+                if (xml_file[i] == '/' || xml_file[i] == '<'){
                     i++;
                     continue;
                 }
                 closed_tag += xml_file[i++];
             }
-            closed_tag += xml_file[i++];
+            i++;
             if (closed_tag == tags.top()->name)
                 tags.pop();
         }
