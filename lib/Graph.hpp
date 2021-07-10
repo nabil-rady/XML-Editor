@@ -6,7 +6,8 @@
 struct Node{
     QString name;
     QString value;
-    Node(QString name, QString value);
+    QString properties;
+    Node(QString name, QString value, QString properties);
 };
 
 class Graph{
@@ -23,6 +24,7 @@ public:
     QString _convert_to_json(Node* node,QString& json ,QHash<Node*, bool>& visited, int level, bool);
 //    QString convert_to_json();
     QString convert_to_json(Node* node, int tab, QString& s, bool last);
+    QString beautify_xml(Node* node, int tab, QString& s);
 };
 
 Graph build_tree(QString xml_file);

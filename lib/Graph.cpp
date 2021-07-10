@@ -2,9 +2,10 @@
 #include <QStack>
 #include <QDebug>
 
-Node::Node(QString name, QString value){
+Node::Node(QString name, QString value, QString properties){
     this->name = name;
     this->value = value;
+    this->properties = properties;
 }
 
 Graph::Graph(){
@@ -156,11 +157,44 @@ QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
     return json + QString("}");
 }
 
+QString Graph::beautify_xml(Node* node, int tab, QString& s){
+    for (int i = 0; i < tab; i++)
+        s += "\t";
+    s += "<" + QString(node->name);
+    if(node->properties != "")
+        s += QString(node->properties) + ">\n";
+    else
+        s += ">\n";
+    tab++;
+    if(node->value != ""){
+        for (int i = 0; i < tab; i++)
+            s += "\t";
+        s += QString(node->value) + "\n";
+        tab--;
+        for(int i = 0; i < tab; i++)
+            s += "\t";
+        s += "<\\" + QString(node->name) + ">\n";
+    } else if (this->adj[node]){
+        for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
+            if ((i+1) == this->adj[node]->end())
+                beautify_xml(*i, tab, s);
+            else
+                beautify_xml(*i, tab, s);
+        }
+        tab--;
+        for(int i = 0; i < tab; i++)
+            s += "\t";
+        s += "<\\" + QString(node->name) + ">\n";
+    }
+    return s;
+}
+
 Graph build_tree(QString xml_file){
     Graph tree;
     QStack <Node*> tags;
     QString current_tag = "";
     QString tag_value = "";
+    QString properties = "";
     
     int len = xml_file.length();
     for (int i = 0; i < len;){
@@ -176,16 +210,22 @@ Graph build_tree(QString xml_file){
         if (xml_file[i] == '<' && xml_file[i + 1] != '/'){
             current_tag = QString("");
             tag_value = QString("");
+            properties = QString("");
            
             while(xml_file[i] != '>'){
                 if (xml_file[i] == '<'){
                     i++;
                     continue;
                 }
+//                if (xml_file[i] != ' '){
+//                    while(xml_file[i] != '>'){
+//                        properties += xml_file[i++];
+//                    }
+//                }
                 current_tag += xml_file[i++];
             }
             i++;
-            Node* parent = new Node(current_tag.trimmed(), QString(""));
+            Node* parent = new Node(current_tag.trimmed(), QString(""), properties);
             if (!tags.empty())
                 tree.add_edge(tags.top(), parent);
             tags.push(parent);
