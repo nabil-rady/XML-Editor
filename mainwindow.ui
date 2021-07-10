@@ -71,7 +71,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionQuit">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/quit.ico</normaloff>:/images/quit.ico</iconset>
    </property>
    <property name="text">
@@ -80,7 +80,7 @@
   </action>
   <action name="actionOpen_XML_File">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/openfile.ico</normaloff>:/images/openfile.ico</iconset>
    </property>
    <property name="text">
@@ -92,7 +92,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/save.ico</normaloff>:/images/save.ico</iconset>
    </property>
    <property name="text">
@@ -104,7 +104,7 @@
   </action>
   <action name="actionCopy">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/copy.ico</normaloff>:/images/copy.ico</iconset>
    </property>
    <property name="text">
@@ -116,7 +116,7 @@
   </action>
   <action name="actionPaste">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/paste.ico</normaloff>:/images/paste.ico</iconset>
    </property>
    <property name="text">
@@ -128,7 +128,7 @@
   </action>
   <action name="actionUndo">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/Undo.ico</normaloff>:/images/Undo.ico</iconset>
    </property>
    <property name="text">
@@ -140,7 +140,7 @@
   </action>
   <action name="actionRedo">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/Redo.ico</normaloff>:/images/Redo.ico</iconset>
    </property>
    <property name="text">
@@ -152,7 +152,7 @@
   </action>
   <action name="actionConvert_To_JSON">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset>
      <normaloff>:/images/json.ico</normaloff>:/images/json.ico</iconset>
    </property>
    <property name="text">
@@ -165,8 +165,6 @@
    </property>
   </action>
  </widget>
- <resources>
-  <include location="res.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
