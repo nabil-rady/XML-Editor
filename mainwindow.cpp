@@ -26,20 +26,50 @@ QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
-    //QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)"));
-    ui->textEdit->clear();
-    QFile input_file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
-    input_file.open(QIODevice::ReadOnly |QIODevice::Text);
-    QTextStream stream(&input_file);
-    QString text= stream.readAll();
-    XMLfile.remove();
-    XMLtemp.resize(0);
-    input_file.copy("myfile.txt");
-    QFile myfile("myfile.txt");
-    ui->textEdit->setPlainText(text);
-    //ui->textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
-    input_file.close();
+
+
+
+   QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    ui->textEdit->setText(text);
+    file.close();
+
+
 }
+void MainWindow::on_actionSave_triggered()
+{
+
+    QString fileName = QFileDialog::getSaveFileName(this,
+             tr("Save Address Book"), "",
+             tr("Address Book (*.xml);;All Files (*)"));
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream out(&file);
+    QString text = ui->textEdit->toPlainText();
+    out<<text ;
+    file.flush();
+    file.close();
+
+
+}
+
+
+
+
+
+
+
+
 bool MainWindow::save()
 {
     if (curFile.isEmpty()) {
@@ -53,6 +83,7 @@ bool MainWindow::saveAs()
     QFileDialog dialog(this);
     dialog.setWindowModality(Qt::WindowModal);
     dialog.setAcceptMode(QFileDialog::AcceptSave);
+    dialog.setDefaultSuffix("*.xml") ;
     if (dialog.exec() != QDialog::Accepted)
         return false;
     return saveFile(dialog.selectedFiles().first());
@@ -68,7 +99,7 @@ bool MainWindow::maybeSave()
                                QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
     switch (ret) {
     case QMessageBox::Save:
-        return save();
+        //return save();
     case QMessageBox::Cancel:
         return false;
     default:
@@ -117,8 +148,12 @@ void MainWindow::setCurrentFile(const QString &fileName)
 }
 
 
-void MainWindow::on_actionSave_triggered()
-{
-    save();
-}
+
+
+
+
+
+
+
+
 

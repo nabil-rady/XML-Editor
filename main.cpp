@@ -1,10 +1,37 @@
 #include "mainwindow.h"
-
+#include "lib/Graph.hpp"
 #include <QApplication>
+#include <QFile>
+void basics()
+{
+    QFile file("tony.txt");
+    if(!file.open(QIODevice::ReadWrite))
+    {
+        qCritical()<<"couldn't open the file";
+        qCritical()<<file.errorString();
+        return;
+
+
+
+    }
+    qInfo()<<"writing file";
+    file.write(QByteArray("hello world"));
+    file.flush();
+
+
+     qInfo()<<"reading file";
+     file.seek(0);
+      qInfo()<<file.readAll();
+      file.close();
+
+}
+
 
 int main(int argc, char *argv[])
-{    
-    Graph t = build_tree("<html><head></head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>");
+{
+    basics();
+
+    // Graph t = build_tree("<html><head></head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>");
     // Node *aa = new Node("A", "");
     // Node *b = new Node("B", "");
     // Node *c = new Node("C", "");
@@ -18,7 +45,7 @@ int main(int argc, char *argv[])
     // t.add_edge(b,e);
     // t.add_edge(c,f);
     // t.add_edge(d,g);
-    t.print();
+    // t.print();
     // delete aa;
     // delete b;
     // delete c;
