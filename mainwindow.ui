@@ -13,7 +13,18 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
-  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QWidget" name="centralwidget">
+   <widget class="QTextEdit" name="textEdit">
+    <property name="geometry">
+     <rect>
+      <x>470</x>
+      <y>30</y>
+      <width>701</width>
+      <height>531</height>
+     </rect>
+    </property>
+   </widget>
+  </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -27,8 +38,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionNew_XML_File"/>
-    <addaction name="separator"/>
     <addaction name="actionOpen_XML_File"/>
     <addaction name="separator"/>
     <addaction name="actionSave"/>
@@ -60,18 +69,6 @@
    <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
-  <action name="actionNew_XML_File">
-   <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/images/newfile.ico</normaloff>:/images/newfile.ico</iconset>
-   </property>
-   <property name="text">
-    <string>New XML File</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+N</string>
-   </property>
-  </action>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="res.qrc">
@@ -87,7 +84,7 @@
      <normaloff>:/images/openfile.ico</normaloff>:/images/openfile.ico</iconset>
    </property>
    <property name="text">
-    <string>Open XML File</string>
+    <string>Choose XML File</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+O</string>

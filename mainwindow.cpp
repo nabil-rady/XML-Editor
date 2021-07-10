@@ -3,13 +3,14 @@
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QSaveFile>
+#include <QSettings>
+#include <QPlainTextEdit>
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 }
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -21,10 +22,40 @@ void MainWindow::on_actionQuit_triggered()
     QApplication::quit();
 }
 
-
-void MainWindow::on_actionNew_XML_File_triggered()
+QFile XMLtemp("out.txt");
+QFile XMLfile("myfile.txt");
+void MainWindow::on_actionOpen_XML_File_triggered()
 {
-    //newFile();
+    //QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)"));
+    ui->textEdit->clear();
+    QFile input_file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
+    input_file.open(QIODevice::ReadOnly |QIODevice::Text);
+    QTextStream stream(&input_file);
+    QString text= stream.readAll();
+    XMLfile.remove();
+    XMLtemp.resize(0);
+    input_file.copy("myfile.txt");
+    QFile myfile("myfile.txt");
+    ui->textEdit->setPlainText(text);
+    //ui->textEdit->setLineWrapMode(QPlainTextEdit::NoWrap);
+    input_file.close();
+}
+bool MainWindow::save()
+{
+    if (curFile.isEmpty()) {
+        return saveAs();
+    } else {
+        return saveFile(curFile);
+    }
+}
+bool MainWindow::saveAs()
+{
+    QFileDialog dialog(this);
+    dialog.setWindowModality(Qt::WindowModal);
+    dialog.setAcceptMode(QFileDialog::AcceptSave);
+    if (dialog.exec() != QDialog::Accepted)
+        return false;
+    return saveFile(dialog.selectedFiles().first());
 }
 bool MainWindow::maybeSave()
 {
@@ -44,23 +75,6 @@ bool MainWindow::maybeSave()
         break;
     }
     return true;
-}
-bool MainWindow::save()
-{
-    if (curFile.isEmpty()) {
-        return saveAs();
-    } else {
-        return saveFile(curFile);
-    }
-}
-bool MainWindow::saveAs()
-{
-    QFileDialog dialog(this);
-    dialog.setWindowModality(Qt::WindowModal);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    if (dialog.exec() != QDialog::Accepted)
-        return false;
-    return saveFile(dialog.selectedFiles().first());
 }
 bool MainWindow::saveFile(const QString &fileName)
 {
@@ -101,38 +115,10 @@ void MainWindow::setCurrentFile(const QString &fileName)
         shownName = "untitled.txt";
     setWindowFilePath(shownName);
 }
-void MainWindow::newFile()
-{
-    if (maybeSave()) {
-        textEdit->clear();
-        setCurrentFile(QString());
-    }
-}
-void MainWindow::loadFile(const QString &fileName)
-{
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("Application"),
-                             tr("Cannot read file %1:\n%2.")
-                             .arg(QDir::toNativeSeparators(fileName), file.errorString()));
-        return;
-    }
 
-    QTextStream in(&file);
-#ifndef QT_NO_CURSOR
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-#endif
-    textEdit->setPlainText(in.readAll());
-#ifndef QT_NO_CURSOR
-    QGuiApplication::restoreOverrideCursor();
-#endif
 
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File loaded"), 2000);
-}
-
-void MainWindow::on_actionOpen_XML_File_triggered()
+void MainWindow::on_actionSave_triggered()
 {
-    loadFile("C:/Users/HP/Desktop/XML/dataproject/New Text Document.txt");
+    save();
 }
 
