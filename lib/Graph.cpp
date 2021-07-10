@@ -218,15 +218,19 @@ Graph build_tree(QString xml_file){
                 if (xml_file[i] == '<'){
                     i++;
                     continue;
-                }
-//                if (xml_file[i] != ' '){
-//                    while(xml_file[i] != '>'){
-//                        properties += xml_file[i++];
-//                    }
-//                }
-                current_tag += xml_file[i++];
+                } else if (xml_file[i] == ' '){
+                    while(xml_file[i] != '>'){
+                        properties += xml_file[i++];
+                    }
+                    if (xml_file[i] == '>'){
+                        i++;
+                        break;
+                    }
+                } else
+                    current_tag += xml_file[i++];
             }
-            i++;
+            if (xml_file[i] == '>')
+                i++;
             Node* parent = new Node(current_tag.trimmed(), QString(""), properties);
             if (!tags.empty())
                 tree.add_edge(tags.top(), parent);
