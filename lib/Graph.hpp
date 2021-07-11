@@ -7,7 +7,8 @@ struct Node{
     QString name;
     QString value;
     QString properties;
-    Node(QString name, QString value, QString properties);
+    bool self_closing;
+    Node(QString name, QString value, QString properties, bool self_closing);
 };
 
 class Graph{

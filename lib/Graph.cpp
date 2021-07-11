@@ -2,10 +2,11 @@
 #include <QStack>
 #include <QDebug>
 
-Node::Node(QString name, QString value, QString properties){
+Node::Node(QString name, QString value, QString properties, bool self_closing){
     this->name = name;
     this->value = value;
     this->properties = properties;
+    this->self_closing = self_closing;
 }
 
 Graph::Graph(){
@@ -130,10 +131,14 @@ void Graph::print(){
 
 
 void Graph::_convert_to_json(Node* node, int tab, QString& s, bool last){
+    QString t = "    ";
     for (int i = 0; i < tab; i++)
-        s += "\t";
+        s += t;
     s += "\"" + QString(node->name) + "\": ";
-    if(node->value != ""){
+    if(node->self_closing){
+        s += "{},\n";
+        return;
+    } else if(node->value != ""){
         s += "\"" + QString(node->value) + "\",\n";
     } else if (this->adj[node]){
         tab++;
@@ -150,7 +155,7 @@ void Graph::_convert_to_json(Node* node, int tab, QString& s, bool last){
         }
         tab--;
         for (int i = 0; i < tab; i++)
-            s += "\t";
+            s += t;
         if(last)
             s += "}\n";
         else
@@ -166,21 +171,25 @@ QString Graph::convert_to_json(){
 }
 
 void Graph::_beautify_xml(Node* node, int tab, QString& s){
+    QString t = "    ";
     for (int i = 0; i < tab; i++)
-        s += "\t";
+        s += t;
     s += "<" + QString(node->name);
-    if(node->properties != "")
+    if(node->properties != ""){
         s += QString(node->properties) + ">\n";
+        if (node->self_closing)
+            return;
+    }
     else
         s += ">\n";
     tab++;
     if(node->value != ""){
         for (int i = 0; i < tab; i++)
-            s += "\t";
+            s += t;
         s += QString(node->value) + "\n";
         tab--;
         for(int i = 0; i < tab; i++)
-            s += "\t";
+            s += t;
         s += "</" + QString(node->name) + ">\n";
     } else if (this->adj[node]){
         for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
@@ -191,7 +200,7 @@ void Graph::_beautify_xml(Node* node, int tab, QString& s){
         }
         tab--;
         for(int i = 0; i < tab; i++)
-            s += "\t";
+            s += t;
         s += "</" + QString(node->name) + ">\n";
     }
 }
@@ -212,6 +221,7 @@ Graph build_tree(QString xml_file){
     
     long long len = xml_file.length();
     for (long long i = 0; i < len;){
+        // ignore white spaces
         while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
             if (i < len - 1)
                 i++;
@@ -221,7 +231,13 @@ Graph build_tree(QString xml_file){
                 break;
             }
         }
-        
+
+        // ignore comments and headings
+        if(xml_file[i] == '<' && (xml_file[i + 1] == '?' || xml_file[i + 1] == '!')){
+            while(xml_file[i++] != '>');
+        }
+
+        // get tag name and the properties
         if (xml_file[i] == '<' && xml_file[i + 1] != '/'){
             current_tag = QString("");
             tag_value = QString("");
@@ -250,12 +266,19 @@ Graph build_tree(QString xml_file){
             while( (properties.length() > 0) && (properties[properties.length()-1] == '\n' || properties[properties.length()-1] == '\t' || properties[properties.length()-1] == ' '))
                 properties = properties.left(properties.length() - 1);
 
-            Node* parent = new Node(current_tag.trimmed(), QString(""), properties);
+            // add the edges to the graph
+            Node* parent;
+            if ((properties.length() > 0) && (properties[properties.length() - 1] == '/'))
+                parent = new Node(current_tag.trimmed(), QString(""), properties, true);
+            else
+                parent = new Node(current_tag.trimmed(), QString(""), properties, false);
 
             if (!tags.empty())
                 tree.add_edge(tags.top(), parent);
-            tags.push(parent);
+            if(!parent->self_closing)
+                tags.push(parent);
 
+            // ignore white spaces
             while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                 if (i < len - 1)
                     i++;
@@ -266,6 +289,7 @@ Graph build_tree(QString xml_file){
                 }
             }
 
+            // get the tag value
             if (xml_file[i] != '<'){
                 while(xml_file[i] != '<'){
                     tag_value += xml_file[i++];
@@ -278,6 +302,7 @@ Graph build_tree(QString xml_file){
 
                 tags.pop(); // after the content, the closed tag comes so we will pop
 
+                // ignore white spaces
                 while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                     if (i < len - 1)
                         i++;
@@ -290,6 +315,8 @@ Graph build_tree(QString xml_file){
             }
 
         }
+
+        // get closing tags
         if (xml_file[i] == '<' && xml_file[i + 1] == '/'){
             QString closed_tag = "";
             while(xml_file[i] != '>'){
@@ -300,9 +327,13 @@ Graph build_tree(QString xml_file){
                 closed_tag += xml_file[i++];
             }
             i++;
+
+            // pop if it's not poped at the value step
             if (closed_tag == tags.top()->name)
                 tags.pop();
         }
+
+        // if white spaces to the end of the file
         if (end){
             i++;
             end = false;
