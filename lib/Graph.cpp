@@ -81,45 +81,46 @@ void Graph::print(){
 }
 */ 
 
-QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level, bool last){
-    QString tab = "";
-    for(int i = 0; i < level; i++)
-        tab+='\t';
-    if (this->adj.find(node) == this->adj.end() || !this->adj[node]){ // leaf node      
-        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\",\n");
-    } else {
-        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("{\n");    
-    }
+//QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level, bool last){
+//    QString tab = "";
+//    for(int i = 0; i < level; i++)
+//        tab+='\t';
+//    if (this->adj.find(node) == this->adj.end() || !this->adj[node]){ // leaf node
+//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\",\n");
+//    } else {
+//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("{\n");
+//    }
     
-    visited[node] = true;
-    if(this->adj[node]){
-        for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
-            if(visited.find(*it) == visited.end()){ 
-                if (it + 1 == this->adj[node]->end() && this->adj[node]->size() != 1 ) // Last and not the only one 
-                    this->_convert_to_json(*it, json, visited, level+1, true);
-                else
-                    this->_convert_to_json(*it, json, visited, level+1, false);
-            }
-        }                                                                                                                           
-    }
-    // if last ems7, else mtms74
-    if (!(this->adj.find(node) == this->adj.end() || !this->adj[node])){ //Not a leaf node      
-        if (last){
-            json = json.left(json.length()-2);
-            json += QString("\n") + tab + QString("}\n");
-        } else {
-            json += tab + QString("},\n");
-        }
-        // if (json[json.length()-2] == ','){
-        //     json = json.left(json.length()-2);
-        //     json += QString("\n") + tab + QString("}\n");
-        // } else {
-        //     json += tab + QString("}\n");
-        // }
+//    visited[node] = true;
+//    if(this->adj[node]){
+//        for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
+//            if(visited.find(*it) == visited.end()){
+//                if (it + 1 == this->adj[node]->end() && this->adj[node]->size() != 1 ) // Last and not the only one
+//                    this->_convert_to_json(*it, json, visited, level+1, true);
+//                else
+//                    this->_convert_to_json(*it, json, visited, level+1, false);
+//            }
+//        }
+//    }
+//    // if last ems7, else mtms74
+//    if (!(this->adj.find(node) == this->adj.end() || !this->adj[node])){ //Not a leaf node
+//        if (last){
+//            json = json.left(json.length()-2);
+//            json += QString("\n") + tab + QString("}\n");
+//        } else {
+//            json += tab + QString("},\n");
+//        }
+//        // if (json[json.length()-2] == ','){
+//        //     json = json.left(json.length()-2);
+//        //     json += QString("\n") + tab + QString("}\n");
+//        // } else {
+//        //     json += tab + QString("}\n");
+//        // }
 
-    }
-    return json;
-}
+//    }
+//    return json;
+//}
+
 
 //QString Graph::convert_to_json(){
 //    QHash<Node*, bool> visited;
@@ -127,7 +128,8 @@ QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& v
 //    return this->_convert_to_json(this->root, json, visited, 1, true) + QString("}");
 //}
 
-QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
+
+void Graph::_convert_to_json(Node* node, int tab, QString& s, bool last){
     for (int i = 0; i < tab; i++)
         s += "\t";
     s += "\"" + QString(node->name) + "\": ";
@@ -138,9 +140,9 @@ QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
         s += "{\n";
         for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
             if ((i+1) == this->adj[node]->end())
-                convert_to_json(*i, tab, s, true);
+                _convert_to_json(*i, tab, s, true);
             else
-                convert_to_json(*i, tab, s, false);
+                _convert_to_json(*i, tab, s, false);
         }
         if(s[s.length()-2] == ','){
             s = s.left(s.length()-2);
@@ -154,12 +156,16 @@ QString Graph::convert_to_json(Node* node, int tab, QString& s, bool last){
             s += "},\n";
         tab--;
     }
-
-    QString json = "{\n" + s;
-    return json + QString("}");
 }
 
-QString Graph::beautify_xml(Node* node, int tab, QString& s){
+QString Graph::convert_to_json(){
+    QString s = "";
+     _convert_to_json(this->root, 1, s, true);
+    QString json = "{\n" + s + QString("}");
+    return json;
+}
+
+void Graph::_beautify_xml(Node* node, int tab, QString& s){
     for (int i = 0; i < tab; i++)
         s += "\t";
     s += "<" + QString(node->name);
@@ -179,15 +185,20 @@ QString Graph::beautify_xml(Node* node, int tab, QString& s){
     } else if (this->adj[node]){
         for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
             if ((i+1) == this->adj[node]->end())
-                beautify_xml(*i, tab, s);
+                _beautify_xml(*i, tab, s);
             else
-                beautify_xml(*i, tab, s);
+                _beautify_xml(*i, tab, s);
         }
         tab--;
         for(int i = 0; i < tab; i++)
             s += "\t";
         s += "<\\" + QString(node->name) + ">\n";
     }
+}
+
+QString Graph::beautify_xml(){
+    QString s = "";
+    _beautify_xml(this->root, 0, s);
     return s;
 }
 

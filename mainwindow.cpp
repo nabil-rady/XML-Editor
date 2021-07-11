@@ -170,8 +170,7 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
     if (check(text))
     {
     Graph t = build_tree(text);
-    QString json="";
-    QString Json_Output=t.convert_to_json(t.get_root(), 1, json, true);
+    QString Json_Output=t.convert_to_json();
     ui->textEdit->setText(Json_Output);
     }
     else
@@ -201,8 +200,7 @@ void MainWindow::on_actionBeautify_triggered()
     //QTextStream text(&file);
     //QString textfile = text.readAll();
     Graph t = build_tree(text);
-    QString xml="";
-    QString Beautify_Output=t.beautify_xml(t.get_root(), 0, xml);
+    QString Beautify_Output=t.beautify_xml();
     ui->textEdit->setText(Beautify_Output);
     }
     else
