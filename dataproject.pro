@@ -11,12 +11,14 @@ CONFIG += c++11
 SOURCES += \
     lib/Graph.cpp \
     lib/check.cpp \
+    lib/fix_xml.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     lib/Graph.hpp \
     lib/check.hpp \
+    lib/fix_xml.hpp \
     mainwindow.h
 
 FORMS += \
