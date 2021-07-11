@@ -148,13 +148,13 @@ void Graph::_convert_to_json(Node* node, int tab, QString& s, bool last){
             s = s.left(s.length()-2);
             s += "\n";
         }
+        tab--;
         for (int i = 0; i < tab; i++)
             s += "\t";
         if(last)
             s += "}\n";
         else
             s += "},\n";
-        tab--;
     }
 }
 
@@ -208,14 +208,16 @@ Graph build_tree(QString xml_file){
     QString current_tag = "";
     QString tag_value = "";
     QString properties = "";
+    bool end = false;
     
-    int len = xml_file.length();
-    for (int i = 0; i < len;){
+    long long len = xml_file.length();
+    for (long long i = 0; i < len;){
         while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
             if (i < len - 1)
                 i++;
             else{
                 // throw EOF
+                end = true;
                 break;
             }
         }
@@ -259,6 +261,7 @@ Graph build_tree(QString xml_file){
                     i++;
                 else{
                     // throw EOF
+                    end = true;
                     break;
                 }
             }
@@ -280,6 +283,7 @@ Graph build_tree(QString xml_file){
                         i++;
                     else{
                         // throw EOF
+                        end = true;
                         break;
                     }
                 }           
@@ -299,8 +303,10 @@ Graph build_tree(QString xml_file){
             if (closed_tag == tags.top()->name)
                 tags.pop();
         }
-        if (i == len - 1)
+        if (end){
             i++;
+            end = false;
+        }
     }
 
     return tree;
