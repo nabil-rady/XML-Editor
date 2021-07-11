@@ -181,7 +181,7 @@ void Graph::_beautify_xml(Node* node, int tab, QString& s){
         tab--;
         for(int i = 0; i < tab; i++)
             s += "\t";
-        s += "<\\" + QString(node->name) + ">\n";
+        s += "</" + QString(node->name) + ">\n";
     } else if (this->adj[node]){
         for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
             if ((i+1) == this->adj[node]->end())
@@ -192,7 +192,7 @@ void Graph::_beautify_xml(Node* node, int tab, QString& s){
         tab--;
         for(int i = 0; i < tab; i++)
             s += "\t";
-        s += "<\\" + QString(node->name) + ">\n";
+        s += "</" + QString(node->name) + ">\n";
     }
 }
 
@@ -242,10 +242,18 @@ Graph build_tree(QString xml_file){
             }
             if (xml_file[i] == '>')
                 i++;
+
+            while((current_tag.length() > 0) && (current_tag[current_tag.length()-1] == '\n' || current_tag[current_tag.length()-1] == '\t' || current_tag[current_tag.length()-1] == ' '))
+                current_tag = current_tag.left(current_tag.length() - 1);
+            while( (properties.length() > 0) && (properties[properties.length()-1] == '\n' || properties[properties.length()-1] == '\t' || properties[properties.length()-1] == ' '))
+                properties = properties.left(properties.length() - 1);
+
             Node* parent = new Node(current_tag.trimmed(), QString(""), properties);
+
             if (!tags.empty())
                 tree.add_edge(tags.top(), parent);
             tags.push(parent);
+
             while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                 if (i < len - 1)
                     i++;
@@ -254,15 +262,19 @@ Graph build_tree(QString xml_file){
                     break;
                 }
             }
+
             if (xml_file[i] != '<'){
                 while(xml_file[i] != '<'){
                     tag_value += xml_file[i++];
-                } // after the content, the closed tag comes so we will pop
+                }
+                while((tag_value.length() > 0) && (tag_value[tag_value.length()-1] == '\n' || tag_value[tag_value.length()-1] == '\t' || tag_value[tag_value.length()-1] == ' '))
+                    tag_value = tag_value.left(tag_value.length() - 1);
+
                 Node* child = tags.top();
                 child->value = tag_value;
-                tags.pop();
-                
-//                tree.add_edge(tags.top(), child);
+
+                tags.pop(); // after the content, the closed tag comes so we will pop
+
                 while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
                     if (i < len - 1)
                         i++;
@@ -290,5 +302,6 @@ Graph build_tree(QString xml_file){
         if (i == len - 1)
             i++;
     }
+
     return tree;
 }
