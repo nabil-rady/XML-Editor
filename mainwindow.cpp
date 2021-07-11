@@ -14,6 +14,7 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    this->setCentralWidget(ui->textEdit);
 }
 MainWindow::~MainWindow()
 {
@@ -192,5 +193,29 @@ void MainWindow::on_actionBeautify_triggered()
     QString xml="";
     QString Beautify_Output=t.beautify_xml(t.get_root(), 0, xml);
     ui->textEdit->setText(Beautify_Output);
+}
+
+
+void MainWindow::on_actionCopy_triggered()
+{
+    ui->textEdit->copy();
+}
+
+
+void MainWindow::on_actionPaste_triggered()
+{
+    ui->textEdit->paste();
+}
+
+
+void MainWindow::on_actionUndo_triggered()
+{
+    ui->textEdit->undo();
+}
+
+
+void MainWindow::on_actionRedo_triggered()
+{
+    ui->textEdit->redo();
 }
 
