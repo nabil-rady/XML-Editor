@@ -1,5 +1,12 @@
 <RCC>
-    <qresource prefix="/">
-        <file>img/88026.png</file>
+    <qresource prefix="/new/prefix1">
+        <file>json.ico</file>
+        <file>openfile.ico</file>
+        <file>paste.ico</file>
+        <file>quit.ico</file>
+        <file>Redo.ico</file>
+        <file>save.ico</file>
+        <file>Undo.ico</file>
+        <file>copy.ico</file>
     </qresource>
 </RCC>

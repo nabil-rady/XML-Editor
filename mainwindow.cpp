@@ -5,6 +5,7 @@
 #include <QSaveFile>
 #include <QSettings>
 #include <QPlainTextEdit>
+#include "lib/Graph.hpp"
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -24,12 +25,12 @@ void MainWindow::on_actionQuit_triggered()
 
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
+QString fileloc="";
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
-
-
-
-   QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
+    QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
+    fileloc=file.fileName();
+    //qDebug()<<fileloc;
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
         QMessageBox::warning(this,"..","can not open the file");
@@ -47,7 +48,7 @@ void MainWindow::on_actionSave_triggered()
 
     QString fileName = QFileDialog::getSaveFileName(this,
              tr("Save Address Book"), "",
-             tr("Address Book (*.xml);;All Files (*)"));
+             tr("Address Book (*.xml);;Address Book (*.json);;All Files (*)"));
     QFile file(fileName);
     if (!file.open(QFile::WriteOnly|QFile::Text))
     {
@@ -146,14 +147,47 @@ void MainWindow::setCurrentFile(const QString &fileName)
         shownName = "untitled.txt";
     setWindowFilePath(shownName);
 }
+void MainWindow::on_actionConvert_To_JSON_triggered()
+{
+    ui->textEdit->clear();
+    //QString text= textEdit->toPlainText();
+    QFile file(fileloc);
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    //ui->textEdit->setText(text);
+    //QTextStream text(&file);
+    //QString textfile = text.readAll();
+    Graph t = build_tree(text);
+    QString json="";
+    QString Json_Output=t.convert_to_json(t.get_root(), 1, json, true);
+    ui->textEdit->setText(Json_Output);
+
+}
 
 
-
-
-
-
-
-
-
-
+void MainWindow::on_actionBeautify_triggered()
+{
+    ui->textEdit->clear();
+    //QString text= textEdit->toPlainText();
+    QFile file(fileloc);
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    //ui->textEdit->setText(text);
+    //QTextStream text(&file);
+    //QString textfile = text.readAll();
+    Graph t = build_tree(text);
+    QString xml="";
+    QString Beautify_Output=t.beautify_xml(t.get_root(), 0, xml);
+    ui->textEdit->setText(Beautify_Output);
+}
 

@@ -28,6 +28,10 @@ private slots:
 
     void on_actionSave_triggered();
 
+    void on_actionConvert_To_JSON_triggered();
+
+    void on_actionBeautify_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool maybeSave();

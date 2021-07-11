@@ -25,4 +25,14 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-RESOURCES +=
+RESOURCES += \
+    resource.qrc \
+    resource.qrc
+
+DISTFILES += \
+    Redo.ico \
+    Undo.ico \
+    json.ico \
+    openfile.ico \
+    paste.ico \
+    quit.ico
