@@ -201,7 +201,7 @@ Graph build_tree(QString xml_file){
     int len = xml_file.length();
     for (int i = 0; i < len;){
         while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
-            if (i < len)
+            if (i < len - 1)
                 i++;
             else{
                 // throw EOF
@@ -236,7 +236,7 @@ Graph build_tree(QString xml_file){
                 tree.add_edge(tags.top(), parent);
             tags.push(parent);
             while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
-                if (i < len)
+                if (i < len - 1)
                     i++;
                 else{
                     // throw EOF
@@ -253,7 +253,7 @@ Graph build_tree(QString xml_file){
                 
 //                tree.add_edge(tags.top(), child);
                 while(xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f'){
-                    if (i < len)
+                    if (i < len - 1)
                         i++;
                     else{
                         // throw EOF
@@ -276,6 +276,8 @@ Graph build_tree(QString xml_file){
             if (closed_tag == tags.top()->name)
                 tags.pop();
         }
+        if (i == len - 1)
+            i++;
     }
     return tree;
 }
