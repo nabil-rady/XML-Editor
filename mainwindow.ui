@@ -14,7 +14,7 @@
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <widget class="QTextEdit" name="textEdit"/>
     </item>
@@ -54,17 +54,30 @@
     <addaction name="separator"/>
     <addaction name="actionRedo"/>
    </widget>
-   <widget class="QMenu" name="menuAbout">
-    <property name="title">
-     <string>About</string>
-    </property>
-    <addaction name="actionAbout_XML_Project"/>
-   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
-   <addaction name="menuAbout"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>toolBar</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpen_XML_File"/>
+   <addaction name="actionSave"/>
+   <addaction name="actionCopy"/>
+   <addaction name="actionPaste"/>
+   <addaction name="actionUndo"/>
+   <addaction name="actionRedo"/>
+   <addaction name="actionBeautify"/>
+   <addaction name="actionConvert_To_JSON"/>
+   <addaction name="actionQuit"/>
+  </widget>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="resource.qrc">
@@ -152,18 +165,17 @@
   <action name="actionConvert_To_JSON">
    <property name="icon">
     <iconset resource="resource.qrc">
-     <normaloff>:/new/prefix1/json.ico</normaloff>:/new/prefix1/json.ico</iconset>
+     <normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Json.ico</normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Json.ico</iconset>
    </property>
    <property name="text">
     <string>Convert To JSON</string>
    </property>
   </action>
-  <action name="actionAbout_XML_Project">
-   <property name="text">
-    <string>About XML Project</string>
-   </property>
-  </action>
   <action name="actionBeautify">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new/prefix1/beautify.ico</normaloff>:/new/prefix1/beautify.ico</iconset>
+   </property>
    <property name="text">
     <string>Beautify</string>
    </property>
