@@ -16,19 +16,65 @@ bool check(QString file)
 	{
 		if (file[i]=='<')
 		{
+            if (file[i + 1] == '?')
+            {
+                while (file[i]!='>')
+                {
+                    i++;
+
+                }
+                continue;
+
+            }
+            if (file[i + 1] == '!'&&file[i + 2] == '-')
+            {
+                while(file[i] != '>')
+                    i++;
+                continue;
+
+
+
+            }
 			if (file[i + 1] != '/')
 			{
+
 				int start = i + 1;
-				while (file[i] != '>')
+                while (file[i] != '>'&& file[i] != ' ')
 				{
-					i++;
+                    i++;
+
 
 				}
+                if(file[i]==' ')
+                {
+                    int end = i;
+    //                QString tag = file.substr(start, end - start);
+                    QString tag = file.mid(start, end - start);
+    //                qDebug() << tag;
+                    checking.push(tag);
+                    while (file[i]!='>') {
+                        i++;
+
+                    }
+                    if(file[i-1]=='/')
+                        checking.pop();
+
+
+                }
+                else
+                {
+
 				int end = i;
 //                QString tag = file.substr(start, end - start);
                 QString tag = file.mid(start, end - start);
 //                qDebug() << tag;
 				checking.push(tag);
+                if(file[i-1]=='/')
+                    checking.pop();
+
+
+                }
+
 
 			}
 			else
@@ -45,6 +91,7 @@ bool check(QString file)
 //                qDebug() << tag;
 				if (!checking.empty()&&checking.top()==tag)
 				{
+                    //qDebug().noquote() << checking.top();
 					checking.pop();
 
 				}
