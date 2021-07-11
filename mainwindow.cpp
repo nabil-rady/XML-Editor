@@ -186,6 +186,8 @@ void MainWindow::on_actionBeautify_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
+    if(check(text))
+    {
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
     //QString textfile = text.readAll();
@@ -193,6 +195,9 @@ void MainWindow::on_actionBeautify_triggered()
     QString xml="";
     QString Beautify_Output=t.beautify_xml(t.get_root(), 0, xml);
     ui->textEdit->setText(Beautify_Output);
+    }
+    else
+        QMessageBox::warning(this,"..","the xml is not consistent");
 }
 
 
