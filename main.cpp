@@ -32,13 +32,9 @@ int main(int argc, char *argv[])
 {
 
     //basics();
-    //Graph t = build_tree("<html><head></head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>");
-
-    // QString s ="<breakfast_menu><food><name>Belgian Waffles</name><price>$5.95</price><description>Two of our famous Belgian Waffles with plenty of real maple syrup</description><calories>650</calories></food><food><name>Strawberry Belgian Waffles</name><price>$7.95</price><description>Light Belgian waffles covered with strawberries and whipped cream</description><calories>900</calories></food><food><name>Berry-Berry Belgian Waffles</name><price>$8.95</price><description>Light Belgian waffles covered with an assortment of fresh berries and whipped cream</description><calories>900</calories></food><food><name>French Toast</name><price>$4.50</price><description>Thick slices made from our homemade sourdough bread</description><calories>600</calories></food><food><name>Homestyle Breakfast</name><price>$6.95</price><description>Two eggs, bacon or sausage, toast, and our ever-popular hash browns</description><calories>950</calories></food></breakfast_menu>";
-
-   // qDebug().noquote() <<check(s) ;
-
-    // Graph t = build_tree(s);
+//    Graph t = build_tree("<html><head>this is head tag</head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>");
+//    QString s = "<bookstore><book category=\"cooking\"><title lang=\"en\">Everyday Italian</title><author>Giada De Laurentiis</author><year>2005</year><price>30.00</price></book><book category=\"children\"><title lang=\"en\">Harry Potter</title><author>J K. Rowling</author><year>2005</year><price>29.99</price></book><book category=\"web\"><title lang=\"en\">Learning XML</title><author>Erik T. Ray</author><year>2003</year><price>39.95</price></book></bookstore>";
+//    Graph t = build_tree(s);
 //    check(QString("<html><head></head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>"));
     // Graph t = build_tree("<html><head></head><body><ul><li>a</li><li>b</li><li>c</li></ul><a>aaa</a><p>ppp</p></body></html>");
     // Node *aa = new Node("A", "");
@@ -55,9 +51,9 @@ int main(int argc, char *argv[])
     // t.add_edge(c,f);
     // t.add_edge(d,g);
     //t.print();
- //   QString json = "", xml = "";
-   // qDebug().noquote() << t.convert_to_json(t.get_root(), 1, json, true);
-    //qDebug().noquote() << t.beautify_xml(t.get_root(), 0, xml);
+//    QString json = "", xml = "";
+//    qDebug().noquote() << t.convert_to_json(t.get_root(), 1, json, true);
+//    qDebug().noquote() << t.beautify_xml(t.get_root(), 0, xml);
     // delete aa;
     // delete b;
     // delete c;
