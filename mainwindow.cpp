@@ -166,10 +166,18 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
     //QString textfile = text.readAll();
+
+    if (check(text))
+    {
     Graph t = build_tree(text);
     QString json="";
     QString Json_Output=t.convert_to_json(t.get_root(), 1, json, true);
     ui->textEdit->setText(Json_Output);
+    }
+    else
+        QMessageBox::warning(this,"..","the xml is not consistent");
+
+
 
 }
 
@@ -186,6 +194,7 @@ void MainWindow::on_actionBeautify_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
+
     if(check(text))
     {
     //ui->textEdit->setText(text);
