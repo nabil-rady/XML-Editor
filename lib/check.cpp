@@ -1,9 +1,9 @@
 #include "check.hpp"
+#include <QDebug>
 
 
 
-
-bool Check(QString file)
+bool check(QString file)
 {
 
 	QStack<QString> checking;
@@ -25,7 +25,9 @@ bool Check(QString file)
 
 				}
 				int end = i;
-                QString tag = file.substr(start, end - start);
+//                QString tag = file.substr(start, end - start);
+                QString tag = file.mid(start, end - start);
+//                qDebug() << tag;
 				checking.push(tag);
 
 			}
@@ -38,7 +40,9 @@ bool Check(QString file)
 
 				}
 				int end = i;
-                QString tag = file.subString(start, end - start);
+//                QString tag = file.subString(start, end - start);
+                QString tag = file.mid(start, end - start);
+//                qDebug() << tag;
 				if (!checking.empty()&&checking.top()==tag)
 				{
 					checking.pop();
