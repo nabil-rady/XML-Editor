@@ -6,6 +6,9 @@
 #include <QSettings>
 #include <QPlainTextEdit>
 #include "lib/Graph.hpp"
+#include "lib/check.hpp"
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)

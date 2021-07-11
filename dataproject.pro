@@ -10,11 +10,13 @@ CONFIG += c++11
 
 SOURCES += \
     lib/Graph.cpp \
+    lib/check.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     lib/Graph.hpp \
+    lib/check.hpp \
     mainwindow.h
 
 FORMS += \
