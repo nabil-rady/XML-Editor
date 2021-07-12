@@ -36,6 +36,7 @@ RESOURCES += \
 DISTFILES += \
     Redo.ico \
     Undo.ico \
+    fix-errors-on-my-pc.jpg \
     json.ico \
     openfile.ico \
     paste.ico \

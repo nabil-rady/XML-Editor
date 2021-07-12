@@ -235,3 +235,15 @@ void MainWindow::on_actionRedo_triggered()
     ui->textEdit->redo();
 }
 
+
+void MainWindow::on_actionCheck_Consistency_triggered()
+{
+
+}
+
+
+void MainWindow::on_actionSolve_Errors_triggered()
+{
+
+}
+
