@@ -1,12 +1,18 @@
 #include "Graph.hpp"
 #include <QStack>
 #include <QDebug>
+#include <QByteArray>
 
 Node::Node(QString name, QString value, QString properties, bool self_closing){
     this->name = name;
     this->value = value;
     this->properties = properties;
     this->self_closing = self_closing;
+}
+
+Match_Pointer::Match_Pointer(int begin, int length){
+    this->begin = begin;
+    this->length = length;
 }
 
 Graph::Graph(){
@@ -72,63 +78,6 @@ void Graph::print(){
     }
     qDebug() << '\n';
 }
-
-/*
-{
-    "name": "mohamed",
-    "hobbies": {
-        "swimming": "true"
-    }
-}
-*/ 
-
-//QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level, bool last){
-//    QString tab = "";
-//    for(int i = 0; i < level; i++)
-//        tab+='\t';
-//    if (this->adj.find(node) == this->adj.end() || !this->adj[node]){ // leaf node
-//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\",\n");
-//    } else {
-//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("{\n");
-//    }
-    
-//    visited[node] = true;
-//    if(this->adj[node]){
-//        for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
-//            if(visited.find(*it) == visited.end()){
-//                if (it + 1 == this->adj[node]->end() && this->adj[node]->size() != 1 ) // Last and not the only one
-//                    this->_convert_to_json(*it, json, visited, level+1, true);
-//                else
-//                    this->_convert_to_json(*it, json, visited, level+1, false);
-//            }
-//        }
-//    }
-//    // if last ems7, else mtms74
-//    if (!(this->adj.find(node) == this->adj.end() || !this->adj[node])){ //Not a leaf node
-//        if (last){
-//            json = json.left(json.length()-2);
-//            json += QString("\n") + tab + QString("}\n");
-//        } else {
-//            json += tab + QString("},\n");
-//        }
-//        // if (json[json.length()-2] == ','){
-//        //     json = json.left(json.length()-2);
-//        //     json += QString("\n") + tab + QString("}\n");
-//        // } else {
-//        //     json += tab + QString("}\n");
-//        // }
-
-//    }
-//    return json;
-//}
-
-
-//QString Graph::convert_to_json(){
-//    QHash<Node*, bool> visited;
-//    QString json = "{\n";
-//    return this->_convert_to_json(this->root, json, visited, 1, true) + QString("}");
-//}
-
 
 void Graph::_convert_to_json(Node* node, int tab, QString& s, bool last){
     QString t = "    ";
@@ -339,6 +288,91 @@ Graph build_tree(QString xml_file){
             end = false;
         }
     }
-
     return tree;
+}
+
+Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator look_ahead_buffer){
+    QByteArray::iterator i = window, j = look_ahead_buffer;
+    QByteArray longest_match("");
+    QByteArray current_match("");
+    Match_Pointer current_match_pointer(0, 0);
+    Match_Pointer longest_match_pointer(0, 0);
+    bool in_a_matching_sequence = false;
+    while(i != look_ahead_buffer){
+        if (*i == *j){
+            if(!in_a_matching_sequence)
+                current_match_pointer.begin = static_cast<int>(look_ahead_buffer - i);
+            in_a_matching_sequence = true;
+            current_match.push_back(*i);
+            i++;
+            j++;
+        }
+        else{
+            if(in_a_matching_sequence){
+                if (current_match.length() > longest_match.length()){
+                    longest_match = current_match;
+                    longest_match_pointer.begin = current_match_pointer.begin;
+                    longest_match_pointer.length = longest_match_pointer.begin - static_cast<int>(look_ahead_buffer - i);
+                }
+                current_match = QByteArray("");
+                current_match_pointer.begin = 0;
+                current_match_pointer.length = 0;
+                j = look_ahead_buffer;
+                in_a_matching_sequence = false;
+            }
+            else
+                i++;
+        }
+    }
+    if (current_match.length() > longest_match.length()){
+        longest_match = current_match;
+        longest_match_pointer.begin = current_match_pointer.begin;
+        longest_match_pointer.length = longest_match_pointer.begin - static_cast<int>(look_ahead_buffer - i);
+    }
+    return longest_match_pointer;
+}
+
+QString minify(QString file){
+    QString minified_file = "";
+    for(int i = 0; i < file.length(); i++){
+        if(file[i] == '\n' || file[i] == '\t' || file[i] =='\r' || file[i] == '\v' || file[i] == '\f')
+            continue;
+        minified_file += file[i];
+    }
+    return minified_file;
+}
+
+QByteArray compress(QString& file){
+    QByteArray minified_file(minify(file).toUtf8());
+    QByteArray compressed_byte_array("");
+    for(QByteArray::iterator it = minified_file.begin(); it != minified_file.end(); it++){
+        QByteArray::iterator window = it - 2048 > minified_file.begin() ? it - 2048 : minified_file.begin();
+        Match_Pointer match = _largest_match(window, it);
+        compressed_byte_array.push_back(match.begin);
+        compressed_byte_array.push_back(match.length);
+        compressed_byte_array.push_back(*it);
+        if (match.length != 0){
+            it += match.length - 1;
+       }
+    }
+    return compressed_byte_array;
+}
+
+QString decompress(QByteArray& compressed_byte_array){
+    QByteArray content("");
+    QByteArray file;
+    for(int i = 0; i < compressed_byte_array.length(); i+=3)
+        content.push_back(compressed_byte_array[i+2]);
+    for(int i = 0; i < compressed_byte_array.length(); i+=3){
+        int begin = compressed_byte_array[i];
+        int length = compressed_byte_array[i+1];
+        if (length == 0){
+            file.push_back(compressed_byte_array[i+2]);
+        }
+        else {
+           for(int j = i/3 - begin; j < i/3 - begin + length; j++)
+               file.push_back(content[j]);
+        }
+    }
+    return QString(file);
 }

@@ -2,6 +2,7 @@
 #include <QList>
 #include <QHash>
 #include <QString>
+#include <QFile>
 
 struct Node{
     QString name;
@@ -9,6 +10,12 @@ struct Node{
     QString properties;
     bool self_closing;
     Node(QString name, QString value, QString properties, bool self_closing);
+};
+
+struct Match_Pointer{
+    int begin;
+    int length;
+    Match_Pointer(int begin, int length);
 };
 
 class Graph{
@@ -30,3 +37,8 @@ public:
 };
 
 Graph build_tree(QString xml_file);
+QString minify(QString file);
+Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator look_ahead_buffer);
+QByteArray compress(QString& file);
+QString decompress(QByteArray& compressed_byte_array);
+
