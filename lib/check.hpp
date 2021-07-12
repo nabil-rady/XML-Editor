@@ -3,4 +3,4 @@
 #include <QStack>
 
 
-bool check(QString ) ;
+bool check(QString ,int*,int* ) ;
