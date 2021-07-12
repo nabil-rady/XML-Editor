@@ -350,28 +350,33 @@ QByteArray compress(QString& file){
         Match_Pointer match = _largest_match(window, it);
         compressed_byte_array.push_back(match.begin);
         compressed_byte_array.push_back(match.length);
-        compressed_byte_array.push_back(*it);
-        if (match.length != 0){
+        if (match.length != 0)
             it += match.length - 1;
-       }
+        else
+            compressed_byte_array.push_back(*it);
     }
     return compressed_byte_array;
 }
 
 QString decompress(QByteArray& compressed_byte_array){
-    QByteArray content("");
     QByteArray file;
-    for(int i = 0; i < compressed_byte_array.length(); i+=3)
-        content.push_back(compressed_byte_array[i+2]);
-    for(int i = 0; i < compressed_byte_array.length(); i+=3){
+    int file_index = 0;
+    for(int i = 0; i < compressed_byte_array.length();){
         int begin = compressed_byte_array[i];
         int length = compressed_byte_array[i+1];
         if (length == 0){
             file.push_back(compressed_byte_array[i+2]);
+            file_index++;
+            i+=3;
         }
+
         else {
-           for(int j = i/3 - begin; j < i/3 - begin + length; j++)
-               file.push_back(content[j]);
+           int prev_file_index = file_index;
+           for(int j = prev_file_index - begin; j < prev_file_index - begin + length; j++){
+               file.push_back(file[j]);
+               file_index++;
+           }
+           i+=2;
         }
     }
     return QString(file);
