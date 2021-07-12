@@ -45,12 +45,6 @@ void MainWindow::on_actionOpen_XML_File_triggered()
     QString text = in.readAll();
     ui->textEdit->setText(text);
     file.close();
-    std::string line;
-    lines.resize(0);
-    while (!file.atEnd())
-    { line = (file.readLine().trimmed()).toStdString();
-      lines.push_back(line);
-    }
 }
 void MainWindow::on_actionSave_triggered()
 {
@@ -70,148 +64,35 @@ void MainWindow::on_actionSave_triggered()
     file.close();
 
 }
-
-
-
-
-
-
-
-
-bool MainWindow::save()
-{
-    if (curFile.isEmpty()) {
-        return saveAs();
-    } else {
-        return saveFile(curFile);
-    }
-}
-bool MainWindow::saveAs()
-{
-    QFileDialog dialog(this);
-    dialog.setWindowModality(Qt::WindowModal);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("*.xml") ;
-    if (dialog.exec() != QDialog::Accepted)
-        return false;
-    return saveFile(dialog.selectedFiles().first());
-}
-bool MainWindow::maybeSave()
-{
-    if (!textEdit->document()->isModified())
-        return true;
-    const QMessageBox::StandardButton ret
-        = QMessageBox::warning(this, tr("Application"),
-                               tr("The document has been modified.\n"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    switch (ret) {
-    case QMessageBox::Save:
-        //return save();
-    case QMessageBox::Cancel:
-        return false;
-    default:
-        break;
-    }
-    return true;
-}
-bool MainWindow::saveFile(const QString &fileName)
-{
-    QString errorMessage;
-
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    QSaveFile file(fileName);
-    if (file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream out(&file);
-        out << textEdit->toPlainText();
-        if (!file.commit()) {
-            errorMessage = tr("Cannot write file %1:\n%2.")
-                           .arg(QDir::toNativeSeparators(fileName), file.errorString());
-        }
-    } else {
-        errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                       .arg(QDir::toNativeSeparators(fileName), file.errorString());
-    }
-    QGuiApplication::restoreOverrideCursor();
-
-    if (!errorMessage.isEmpty()) {
-        QMessageBox::warning(this, tr("Application"), errorMessage);
-        return false;
-    }
-
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
-    return true;
-}
-void MainWindow::setCurrentFile(const QString &fileName)
-{
-    curFile = fileName;
-    textEdit->document()->setModified(false);
-    setWindowModified(false);
-
-    QString shownName = curFile;
-    if (curFile.isEmpty())
-        shownName = "untitled.txt";
-    setWindowFilePath(shownName);
-}
 void MainWindow::on_actionConvert_To_JSON_triggered()
 {
-    ui->textEdit->clear();
-    //QString text= textEdit->toPlainText();
-    QFile file(fileloc);
-    if (!file.open(QFile::ReadOnly|QFile::Text))
-    {
-        QMessageBox::warning(this,"..","can not open the file");
-        return ;
-    }
-    QTextStream in(&file);
-    QString text = in.readAll();
-    //ui->textEdit->setText(text);
-    //QTextStream text(&file);
-    //QString textfile = text.readAll();
     int start;
     int end;
 
-    if (check(text,&start,&end))
+    if (check(ui->textEdit->toPlainText(),&start,&end))
     {
-    Graph t = build_tree(text);
+    Graph t = build_tree(ui->textEdit->toPlainText());
     QString Json_Output=t.convert_to_json();
     ui->textEdit->setText(Json_Output);
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
-
-
-
 }
 
 
 void MainWindow::on_actionBeautify_triggered()
 {
-    ui->textEdit->clear();
-    //QString text= textEdit->toPlainText();
-    QFile file(fileloc);
-    if (!file.open(QFile::ReadOnly|QFile::Text))
-    {
-        QMessageBox::warning(this,"..","can not open the file");
-        return ;
-    }
-    QTextStream in(&file);
-    QString text = in.readAll();
     int start;
     int end;
 
-    if(check(text,&start,&end))
+    if (check(ui->textEdit->toPlainText(),&start,&end))
     {
-    //ui->textEdit->setText(text);
-    //QTextStream text(&file);
-    //QString textfile = text.readAll();
-    Graph t = build_tree(text);
-    QString Beautify_Output=t.beautify_xml();
-    ui->textEdit->setText(Beautify_Output);
+    Graph t = build_tree(ui->textEdit->toPlainText());
+    QString Json_Output=t.beautify_xml();
+    ui->textEdit->setText(Json_Output);
     }
     else
-        QMessageBox::warning(this,"..","Your xml is not consistent");
+        QMessageBox::warning(this,"..","the xml is not consistent");
 }
 
 
@@ -241,6 +122,7 @@ void MainWindow::on_actionRedo_triggered()
 
 void MainWindow::on_actionCheck_Consistency_triggered()
 {
+    ui->textEdit->clear();
     QFile file(fileloc);
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
@@ -250,39 +132,60 @@ void MainWindow::on_actionCheck_Consistency_triggered()
     QTextStream in(&file);
     QString text = in.readAll();
     int start=0,end=text.length()-1;
-    QTextCharFormat format;
-    QTextCursor cursor( ui->textEdit->textCursor() );
-    std::string line;
-    if(check(text,&start,&end))
+    QString error="";
+    QString notmodified="";
+//    QTextCharFormat format;
+//    QTextCursor cursor( ui->textEdit->textCursor() );
+    //std::string line;
+    check(text,&start,&end);
+    for (int i=0;i<text.length();i++)
     {
-     QMessageBox enteredString;
-     enteredString.setText("Correct XML File");
-     enteredString.exec();
+        notmodified+=text[i];
+        if (i<start)
+        {
+            ui->textEdit->setTextColor( QColor( "black" ) );
+            ui->textEdit->append(notmodified);
+        }
+        if (i>=start&&i<=end)
+        {
+            error+=text[i];
+            if (i==end)
+            {
+                ui->textEdit->setTextColor( QColor( "red" ) );
+                ui->textEdit->append(error);
+            }
+        }
     }
-    else
-    {int j =0;
-      for (int i=1;i<text.size()+1;i++)
-      {
-          //line=lines[i-1];
-          if(i == start)
-          {
-              format.setFontWeight( QFont::TypeWriter );
-              format.setForeground( QBrush( QColor(Qt::red) ) );
-              cursor.setCharFormat( format );
-              cursor.insertText(QString::fromStdString(line));
-              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
-              //j++;
-          }
-          else
-          {
-              format.setFontWeight( QFont::TypeWriter );
-              format.setForeground( QBrush( QColor(Qt::black) ) );
-              cursor.setCharFormat( format );
-              cursor.insertText(QString::fromStdString(line));
-              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
-          }
-      }
-    }
+//    if(check(text,&start,&end))
+//    {
+//     QMessageBox enteredString;
+//     enteredString.setText("Correct XML File");
+//     enteredString.exec();
+//    }
+//    else
+//    {int j =0;
+//      for (int i=1;i<text.size()+1;i++)
+//      {
+//          //line=lines[i-1];
+//          if(i == start)
+//          {
+//              format.setFontWeight( QFont::TypeWriter );
+//              format.setForeground( QBrush( QColor(Qt::red) ) );
+//              cursor.setCharFormat( format );
+//              cursor.insertText(QString::fromStdString(line));
+//              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
+//              //j++;
+//          }
+//          else
+//          {
+//              format.setFontWeight( QFont::TypeWriter );
+//              format.setForeground( QBrush( QColor(Qt::black) ) );
+//              cursor.setCharFormat( format );
+//              cursor.insertText(QString::fromStdString(line));
+//              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
+//          }
+//      }
+//    }
 //    if (check(text,&start,&end))
 //    {
 //        QMessageBox::information(this,"..","No errors found");
@@ -331,7 +234,6 @@ void MainWindow::on_actionCopress_XML_File_triggered()
 void MainWindow::on_actionDecompress_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.zxml)")));
-    //QFile file("C:\\Users\\s\\Desktop\\bom1.xlsx");
         char file_data;
         QByteArray arr;
         if(!file.open(QFile::ReadOnly))
@@ -349,12 +251,16 @@ void MainWindow::on_actionDecompress_triggered()
 
         }
         file.close();
-//    QTextStream in(&file);
-//    QByteArray text = in.readAll().toUtf8();
-    //QString filelocation=file.fileName();
     QString txt = decompress(arr);
     ui->textEdit->clear();
     ui->textEdit->setText(txt);
 
+}
+
+
+void MainWindow::on_actionColor_triggered()
+{
+    //ui->textEdit->clear();
+    ui->textEdit->setHtml(ui->textEdit->toPlainText());
 }
 

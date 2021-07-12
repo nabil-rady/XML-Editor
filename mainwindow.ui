@@ -45,6 +45,7 @@
     <addaction name="actionSolve_Errors"/>
     <addaction name="actionCopress_XML_File"/>
     <addaction name="actionDecompress"/>
+    <addaction name="actionColor"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -212,6 +213,11 @@
   <action name="actionDecompress">
    <property name="text">
     <string>Decompress</string>
+   </property>
+  </action>
+  <action name="actionColor">
+   <property name="text">
+    <string>Color</string>
    </property>
   </action>
  </widget>
