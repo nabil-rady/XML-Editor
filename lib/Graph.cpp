@@ -482,7 +482,7 @@ QByteArray compress(QString& file){
     QByteArray minified_file(minify(file).toUtf8());
     QByteArray compressed_byte_array("");
     for(QByteArray::iterator it = minified_file.begin(); it != minified_file.end(); it++){
-        QByteArray::iterator window = it - 127 > minified_file.begin() ? it - 127 : minified_file.begin();
+        QByteArray::iterator window = it - 255 > minified_file.begin() ? it - 255 : minified_file.begin();
         Match_Pointer match = _largest_match(window, it);
         compressed_byte_array.push_back(match.begin);
         compressed_byte_array.push_back(match.length);
@@ -497,10 +497,10 @@ QByteArray compress(QString& file){
 
 QString decompress(QByteArray& compressed_byte_array){
     QByteArray file("");
-    qsizetype file_index = 0;
+    unsigned int file_index = 0;
     for(qsizetype i = 0; i < compressed_byte_array.length();){
-        qsizetype begin = compressed_byte_array[i];
-        qsizetype length = compressed_byte_array[i+1];
+        qsizetype begin = static_cast<qsizetype>(static_cast<unsigned char>(compressed_byte_array[i]));
+        qsizetype length = static_cast<qsizetype>(static_cast<unsigned char>(compressed_byte_array[i+1]));
         if (length == 0){
             file.push_back(compressed_byte_array[i+2]);
             file_index++;
@@ -508,7 +508,7 @@ QString decompress(QByteArray& compressed_byte_array){
         }
         else {
            int prev_file_index = file_index;
-           for(int j = prev_file_index - begin; j < prev_file_index - begin + length; j++){
+           for(unsigned int j = prev_file_index - begin; j < prev_file_index - begin + length; j++){
                file.push_back(file[j]);
                file_index++;
            }
