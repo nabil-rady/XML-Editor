@@ -352,7 +352,7 @@ void MainWindow::on_actionDecompress_triggered()
 //    QTextStream in(&file);
 //    QByteArray text = in.readAll().toUtf8();
     //QString filelocation=file.fileName();
-    QString txt=decompress(arr);
+    QString txt = decompress(arr);
     ui->textEdit->clear();
     ui->textEdit->setText(txt);
 
