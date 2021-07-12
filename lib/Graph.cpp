@@ -170,10 +170,7 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
             }
             for (int i = 0; i < tab; i++)
                 s += t;
-            if(last)
-                s += "]\n";
-            else
-                s += "],\n";
+            s += "]\n";
             tab--;
         }
     } else if (this->adj[node]) {
@@ -215,9 +212,14 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
             }
         }
 
-        if (s[s.length() - 2] == ',' && s[s.length() - 3] != ']') {
+        if (s[s.length() - 2] == ',') {
             s = s.left(s.length() - 2);
             s += "\n";
+        } else if (s[s.length() - 2] == ']'){
+            if (!last){
+                s = s.left(s.length() - 1);
+                s += ",\n";
+            }
         }
         tab--;
 
