@@ -434,7 +434,7 @@ Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator l
     Match_Pointer current_match_pointer(0, 0);
     Match_Pointer longest_match_pointer(0, 0);
     bool in_a_matching_sequence = false;
-    while(i != look_ahead_buffer){
+    while(i != look_ahead_buffer-1){
         if (*i == *j){
             if(!in_a_matching_sequence)
                 current_match_pointer.begin = static_cast<int>(look_ahead_buffer - i);
@@ -508,6 +508,7 @@ QString decompress(QByteArray& compressed_byte_array){
 
         else {
            int prev_file_index = file_index;
+           Q_ASSERT(prev_file_index-begin+length<file.length());
            for(int j = prev_file_index - begin; j < prev_file_index - begin + length; j++){
                file.push_back(file[j]);
                file_index++;

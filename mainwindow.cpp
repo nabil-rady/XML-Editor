@@ -7,7 +7,7 @@
 #include <QPlainTextEdit>
 #include "lib/Graph.hpp"
 #include "lib/check.hpp"
-
+#include <QColor>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,6 +30,7 @@ void MainWindow::on_actionQuit_triggered()
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
 QString fileloc="";
+std::vector <std::string> lines;
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
@@ -44,12 +45,15 @@ void MainWindow::on_actionOpen_XML_File_triggered()
     QString text = in.readAll();
     ui->textEdit->setText(text);
     file.close();
-
-
+    std::string line;
+    lines.resize(0);
+    while (!file.atEnd())
+    { line = (file.readLine().trimmed()).toStdString();
+      lines.push_back(line);
+    }
 }
 void MainWindow::on_actionSave_triggered()
 {
-
     QString fileName = QFileDialog::getSaveFileName(this,
              tr("Save Address Book"), "",
              tr("Address Book (*.xml);;Address Book (*.json);;All Files (*)"));
@@ -64,7 +68,6 @@ void MainWindow::on_actionSave_triggered()
     out<<text ;
     file.flush();
     file.close();
-
 
 }
 
@@ -246,22 +249,112 @@ void MainWindow::on_actionCheck_Consistency_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
-    int start,end;
-    if (check(text,&start,&end))
+    int start=0,end=text.length()-1;
+    QTextCharFormat format;
+    QTextCursor cursor( ui->textEdit->textCursor() );
+    std::string line;
+    if(check(text,&start,&end))
     {
-        QMessageBox::information(this,"..","No errors found");
-
+     QMessageBox enteredString;
+     enteredString.setText("Correct XML File");
+     enteredString.exec();
     }
     else
-        QMessageBox::warning(this,"..","Your xml is not consistent");
+    {int j =0;
+      for (int i=1;i<text.size()+1;i++)
+      {
+          //line=lines[i-1];
+          if(i == start)
+          {
+              format.setFontWeight( QFont::TypeWriter );
+              format.setForeground( QBrush( QColor(Qt::red) ) );
+              cursor.setCharFormat( format );
+              cursor.insertText(QString::fromStdString(line));
+              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
+              //j++;
+          }
+          else
+          {
+              format.setFontWeight( QFont::TypeWriter );
+              format.setForeground( QBrush( QColor(Qt::black) ) );
+              cursor.setCharFormat( format );
+              cursor.insertText(QString::fromStdString(line));
+              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
+          }
+      }
+    }
+//    if (check(text,&start,&end))
+//    {
+//        QMessageBox::information(this,"..","No errors found");
 
-    return;
+//    }
+//    else
+//    {
+//        QString test =text.mid(start, end - start);
+//        test.setTextColor("QLineEdit { background-color: yellow }");
+//    }
+
 
 }
 
 
 void MainWindow::on_actionSolve_Errors_triggered()
 {
+
+}
+
+
+void MainWindow::on_actionCopress_XML_File_triggered()
+{
+    QFile file(fileloc);
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    QByteArray compressed=compress(text);
+    QString fileName = QFileDialog::getSaveFileName(this,
+             tr("Save Address Book"), "",
+             tr("Address Book (*.zxml);;All Files (*)"));
+    //QFile newDoc("C:/Users/HP/Desktop");
+    QFile newDoc(fileName);
+    if(newDoc.open(QIODevice::WriteOnly)){
+        newDoc.write(compressed);
+    }
+
+    newDoc.close();
+}
+
+
+void MainWindow::on_actionDecompress_triggered()
+{
+    QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.zxml)")));
+    //QFile file("C:\\Users\\s\\Desktop\\bom1.xlsx");
+        char file_data;
+        QByteArray arr;
+        if(!file.open(QFile::ReadOnly))
+        {
+            qDebug() << " Could not open the file for reading";
+            return;
+        }
+
+        while(!file.atEnd())
+        {
+          // return value from 'file.read' should always be sizeof(char).
+          file.read(&file_data,sizeof(char));
+          arr.push_back(file_data);
+          // do something with 'file_data'.
+
+        }
+        file.close();
+//    QTextStream in(&file);
+//    QByteArray text = in.readAll().toUtf8();
+    //QString filelocation=file.fileName();
+    QString txt=decompress(arr);
+    ui->textEdit->clear();
+    ui->textEdit->setText(txt);
 
 }
 

@@ -43,6 +43,8 @@
     <addaction name="actionBeautify"/>
     <addaction name="actionCheck_Consistency"/>
     <addaction name="actionSolve_Errors"/>
+    <addaction name="actionCopress_XML_File"/>
+    <addaction name="actionDecompress"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -200,6 +202,16 @@
    </property>
    <property name="text">
     <string>Solve Errors</string>
+   </property>
+  </action>
+  <action name="actionCopress_XML_File">
+   <property name="text">
+    <string>Copress XML File</string>
+   </property>
+  </action>
+  <action name="actionDecompress">
+   <property name="text">
+    <string>Decompress</string>
    </property>
   </action>
  </widget>

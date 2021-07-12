@@ -44,6 +44,10 @@ private slots:
 
     void on_actionSolve_Errors_triggered();
 
+    void on_actionCopress_XML_File_triggered();
+
+    void on_actionDecompress_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool maybeSave();
