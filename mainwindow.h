@@ -40,6 +40,10 @@ private slots:
 
     void on_actionRedo_triggered();
 
+    void on_actionCheck_Consistency_triggered();
+
+    void on_actionSolve_Errors_triggered();
+
 private:
     Ui::MainWindow *ui;
     bool maybeSave();
