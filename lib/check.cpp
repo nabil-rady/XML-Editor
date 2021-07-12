@@ -3,11 +3,19 @@
 
 
 
-bool check(QString file)
+bool check(QString file,int *startindex,int *endindex)
 {
+    *startindex=0;
+    *endindex=0;
+
 
 	QStack<QString> checking;
 	QStack<QString> closing;
+    QStack<int> starting;
+
+    QStack<int> ending;
+
+
 
 	
 	
@@ -52,12 +60,18 @@ bool check(QString file)
                     QString tag = file.mid(start, end - start);
     //                qDebug() << tag;
                     checking.push(tag);
+                    starting.push(start);
+                    ending.push(end);
                     while (file[i]!='>') {
                         i++;
 
                     }
                     if(file[i-1]=='/')
-                        checking.pop();
+                       { checking.pop();
+                        starting.pop();
+                        ending.pop();
+                    }
+
 
 
                 }
@@ -69,8 +83,13 @@ bool check(QString file)
                 QString tag = file.mid(start, end - start);
 //                qDebug() << tag;
 				checking.push(tag);
+                starting.push(start);
+                ending.push(end);
                 if(file[i-1]=='/')
-                    checking.pop();
+                {checking.pop();
+                    starting.pop();
+                    ending.pop();
+                }
 
 
                 }
@@ -93,12 +112,19 @@ bool check(QString file)
 				{
                     //qDebug().noquote() << checking.top();
 					checking.pop();
+                    starting.pop();
+                    ending.pop();
 
 				}
 				else
 				{
 					closing.push(tag);
-					
+                    if (*startindex==0)
+                                       {
+                                           *startindex = start-2;
+                                           *endindex = end+1;
+
+                                       }
 					return false;
 
 				}
@@ -110,19 +136,28 @@ bool check(QString file)
 		}
 
 	}
-	if (closing.empty()&&checking.empty())
-	{
-		return true;
+    if (closing.empty() && checking.empty())
+       {
+           return true;
 
-	}
-	else
-	{
-		
-		return false;
-	}
+       }
+       else
+       {
+           if (closing.empty())
+           {
+               *startindex = starting.top()-1;
+                   *endindex = ending.top()+1;
 
-		
 
+                   return false;
+
+           }
+           else
+           {
+
+               return false;
+           }
+    }
 
 }
 

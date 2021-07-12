@@ -166,8 +166,10 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
     //QString textfile = text.readAll();
+    int start;
+    int end;
 
-    if (check(text))
+    if (check(text,&start,&end))
     {
     Graph t = build_tree(text);
     QString Json_Output=t.convert_to_json();
@@ -193,8 +195,10 @@ void MainWindow::on_actionBeautify_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
+    int start;
+    int end;
 
-    if(check(text))
+    if(check(text,&start,&end))
     {
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
