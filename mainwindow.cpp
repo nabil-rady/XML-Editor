@@ -166,8 +166,10 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
     //QString textfile = text.readAll();
+    int start;
+    int end;
 
-    if (check(text))
+    if (check(text,&start,&end))
     {
     Graph t = build_tree(text);
     QString Json_Output=t.convert_to_json();
@@ -193,8 +195,10 @@ void MainWindow::on_actionBeautify_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
+    int start;
+    int end;
 
-    if(check(text))
+    if(check(text,&start,&end))
     {
     //ui->textEdit->setText(text);
     //QTextStream text(&file);
@@ -204,7 +208,7 @@ void MainWindow::on_actionBeautify_triggered()
     ui->textEdit->setText(Beautify_Output);
     }
     else
-        QMessageBox::warning(this,"..","the xml is not consistent");
+        QMessageBox::warning(this,"..","Your xml is not consistent");
 }
 
 
@@ -229,5 +233,35 @@ void MainWindow::on_actionUndo_triggered()
 void MainWindow::on_actionRedo_triggered()
 {
     ui->textEdit->redo();
+}
+
+
+void MainWindow::on_actionCheck_Consistency_triggered()
+{
+    QFile file(fileloc);
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    int start,end;
+    if (check(text,&start,&end))
+    {
+        QMessageBox::information(this,"..","No errors found");
+
+    }
+    else
+        QMessageBox::warning(this,"..","Your xml is not consistent");
+
+    return;
+
+}
+
+
+void MainWindow::on_actionSolve_Errors_triggered()
+{
+
 }
 
