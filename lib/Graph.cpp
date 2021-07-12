@@ -485,9 +485,10 @@ QByteArray compress(QString& file){
         QByteArray::iterator window = it - 255 > minified_file.begin() ? it - 255 : minified_file.begin();
         Match_Pointer match = _largest_match(window, it);
         compressed_byte_array.push_back(match.begin);
-        compressed_byte_array.push_back(match.length);
-        if (match.length != 0)
+        if (match.begin != 0){
             it += match.length - 1;
+            compressed_byte_array.push_back(match.length);
+        }
         else{
             compressed_byte_array.push_back(*it);
         }
@@ -500,14 +501,14 @@ QString decompress(QByteArray& compressed_byte_array){
     unsigned int file_index = 0;
     for(qsizetype i = 0; i < compressed_byte_array.length();){
         qsizetype begin = static_cast<qsizetype>(static_cast<unsigned char>(compressed_byte_array[i]));
-        qsizetype length = static_cast<qsizetype>(static_cast<unsigned char>(compressed_byte_array[i+1]));
-        if (length == 0){
-            file.push_back(compressed_byte_array[i+2]);
+        if (begin == 0){
+            file.push_back(compressed_byte_array[i+1]);
             file_index++;
-            i+=3;
+            i+=2;
         }
         else {
            int prev_file_index = file_index;
+           qsizetype length = static_cast<qsizetype>(static_cast<unsigned char>(compressed_byte_array[i+1]));
            for(unsigned int j = prev_file_index - begin; j < prev_file_index - begin + length; j++){
                file.push_back(file[j]);
                file_index++;
