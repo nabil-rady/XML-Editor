@@ -229,11 +229,8 @@ void MainWindow::on_actionDecompress_triggered()
 
         while(!file.atEnd())
         {
-          // return value from 'file.read' should always be sizeof(char).
           file.read(&file_data,sizeof(char));
           arr.push_back(file_data);
-          // do something with 'file_data'.
-
         }
         file.close();
     QString txt = decompress(arr);
@@ -253,6 +250,6 @@ void MainWindow::on_actionMinify_triggered()
     ui->textEdit->setText(Json_Output);
     }
     else
-        QMessageBox::warning(this,"..","the xml is not consistent");
+        QMessageBox::warning(this,"..","The xml file is not consistent");
 }
 
