@@ -424,6 +424,12 @@ Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator l
 QString minify(QString file){
     QString minified_file = "";
     for(int i = 0; i < file.length(); i++){
+        if ((i < file.length() - 1) && (file[i] == ' ' && file[i + 1] != ' ')){
+            minified_file += file[i];
+            continue;
+        } else if ((i < file.length() - 1) && (file[i] == ' ' && file[i + 1] == ' ')){
+            continue;
+        }
         if(file[i] == '\n' || file[i] == '\t' || file[i] =='\r' || file[i] == '\v' || file[i] == '\f')
             continue;
         minified_file += file[i];
