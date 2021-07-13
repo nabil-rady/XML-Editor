@@ -186,3 +186,25 @@ bool check(QString file,int *startindex,int *endindex)
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
