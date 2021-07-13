@@ -147,14 +147,14 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
         return;
     } else if (node->value != "") { // if there is a content
         if (array && l_arr){
-            s += "\"" + QString(node->value) + "\"\n";
+            s += '\"' + QString(node->value) + "\"\n";
             tab--;
             for (int i = 0; i < tab; i++)
                 s += t;
             s += "],\n";
         }
         else
-            s += "\"" + QString(node->value) + "\",\n";
+            s += '\"' + QString(node->value) + "\",\n";
 
     } else if (this->adj[node]) { // if the node has children
         tab++;
@@ -291,8 +291,8 @@ Graph build_tree(QString xml_file) {
 
     long long len = xml_file.length();
     for (long long i = 0; i < len;) {
-        // ignore white spaces
-        while (xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f') {
+        // ignore white spaces and meainingless words
+        while (xml_file[i] != '<') {
             if (i < len - 1)
                 i++;
             else {
@@ -304,7 +304,19 @@ Graph build_tree(QString xml_file) {
 
         // ignore comments and headings
         if (xml_file[i] == '<' && (xml_file[i + 1] == '?' || xml_file[i + 1] == '!')) {
-            while (xml_file[i++] != '>');
+            if (xml_file[i + 1] == '?'){
+                while (xml_file[i] != '>' && xml_file[i-1] != '?'){
+                    i++;
+                }
+                if (xml_file[i] == '>')
+                    i++;
+            } else if(xml_file[i + 1] == '!'){
+                while (xml_file[i] != '>' && xml_file[i-1] != '-' && xml_file[i-2] != '-'){
+                    i++;
+                }
+                if (xml_file[i] == '>')
+                    i++;
+            }
         }
 
         // get tag name and the properties
@@ -401,6 +413,17 @@ Graph build_tree(QString xml_file) {
             // pop if it's not poped at the value step
             if (closed_tag == tags.top()->name)
                 tags.pop();
+
+            // ignore white spaces and meainingless words
+            while (xml_file[i] != '<') {
+                if (i < len - 1)
+                    i++;
+                else {
+                    // throw EOF
+                    end = true;
+                    break;
+                }
+            }
         }
 
         // if white spaces to the end of the file
