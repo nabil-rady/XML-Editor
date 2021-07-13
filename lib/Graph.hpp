@@ -10,6 +10,7 @@ struct Node{
     QString properties;
     bool self_closing;
     bool parent_of_array;
+    bool object;
     Node(QString name, QString value, QString properties, bool self_closing);
 };
 
