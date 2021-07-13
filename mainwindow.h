@@ -22,37 +22,20 @@ public:
 private slots:
     void on_actionQuit_triggered();
     void on_actionOpen_XML_File_triggered();
-
-    bool save();
-    bool saveAs();
-
     void on_actionSave_triggered();
-
     void on_actionConvert_To_JSON_triggered();
-
     void on_actionBeautify_triggered();
-
     void on_actionCopy_triggered();
-
     void on_actionPaste_triggered();
-
     void on_actionUndo_triggered();
-
     void on_actionRedo_triggered();
-
     void on_actionCheck_Consistency_triggered();
-
     void on_actionSolve_Errors_triggered();
-
     void on_actionCopress_XML_File_triggered();
-
     void on_actionDecompress_triggered();
 
 private:
     Ui::MainWindow *ui;
-    bool maybeSave();
-    bool saveFile(const QString &fileName);
-    void setCurrentFile(const QString &fileName);
     QPlainTextEdit *textEdit;
     QString curFile;
 };

@@ -15,9 +15,9 @@ struct Node{
 };
 
 struct Match_Pointer{
-    int begin;
-    int length;
-    Match_Pointer(int begin, int length);
+    qsizetype begin;
+    qsizetype length;
+    Match_Pointer(qsizetype begin, qsizetype length);
 };
 
 class Graph{

@@ -50,6 +50,14 @@ bool check(QString file,int *startindex,int *endindex)
                 while (file[i] != '>'&& file[i] != ' ')
 				{
                     i++;
+                    if (!(i < len))
+                                       {
+                                           *startindex = start - 1;
+                                           *endindex = len - 1;
+
+                                           return false;
+
+                                       }
 
 
 				}
@@ -64,6 +72,14 @@ bool check(QString file,int *startindex,int *endindex)
                     ending.push(end);
                     while (file[i]!='>') {
                         i++;
+                        if (!(i < len))
+                                           {
+                                               *startindex = start - 1;
+                                               *endindex = end+1;
+
+                                               return false;
+
+                                           }
 
                     }
                     if(file[i-1]=='/')
@@ -102,6 +118,14 @@ bool check(QString file,int *startindex,int *endindex)
 				while (file[i] != '>')
 				{
 					i++;
+                    if (!(i < len))
+                                       {
+                                           *startindex = start - 2;
+                                           *endindex = len - 1;
+
+                                           return false;
+
+                                       }
 
 				}
 				int end = i;
