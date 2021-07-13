@@ -88,8 +88,8 @@ void MainWindow::on_actionBeautify_triggered()
     if (check(ui->textEdit->toPlainText(),&start,&end))
     {
     Graph t = build_tree(ui->textEdit->toPlainText());
-    QString Json_Output=t.beautify_xml();
-    ui->textEdit->setText(Json_Output);
+    QString beautify_Output=t.beautify_xml();
+    ui->textEdit->setText(beautify_Output);
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
@@ -215,3 +215,19 @@ void MainWindow::on_actionDecompress_triggered()
     ui->textEdit->clear();
     ui->textEdit->setText(txt);
 }
+
+void MainWindow::on_actionMinify_triggered()
+{
+    int start;
+    int end;
+
+    if (check(ui->textEdit->toPlainText(),&start,&end))
+    {
+    //Graph t = build_tree(ui->textEdit->toPlainText());
+    QString Json_Output=minify(ui->textEdit->toPlainText());
+    ui->textEdit->setText(Json_Output);
+    }
+    else
+        QMessageBox::warning(this,"..","the xml is not consistent");
+}
+

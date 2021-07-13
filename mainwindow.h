@@ -34,6 +34,8 @@ private slots:
     void on_actionCopress_XML_File_triggered();
     void on_actionDecompress_triggered();
 
+    void on_actionMinify_triggered();
+
 private:
     Ui::MainWindow *ui;
     QPlainTextEdit *textEdit;
