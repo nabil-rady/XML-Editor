@@ -7,6 +7,7 @@
 #include <QPlainTextEdit>
 #include "lib/Graph.hpp"
 #include "lib/check.hpp"
+#include "lib/fix_xml.hpp"
 #include <QColor>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -126,15 +127,18 @@ void MainWindow::on_actionRedo_triggered()
 
 void MainWindow::on_actionCheck_Consistency_triggered()
 {
-    ui->textEdit->clear();
-    QFile file(fileloc);
-    if (!file.open(QFile::ReadOnly|QFile::Text))
+
+    QString text = ui->textEdit->toPlainText();
+    int startindex;
+    int endindex;
+
+    if (check(text,&startindex,&endindex))
     {
-        QMessageBox::warning(this,"..","can not open the file");
-        return ;
+        QMessageBox::information(this,"..","Your Xml is consistent");
+
+
     }
-    QTextStream in(&file);
-    QString text = in.readAll();
+    ui->textEdit->clear();
     int start=0,end=text.length()-1;
     QString before_error="";
     QString after_error="";
@@ -168,6 +172,27 @@ void MainWindow::on_actionCheck_Consistency_triggered()
 
 void MainWindow::on_actionSolve_Errors_triggered()
 {
+    QString new_xml=fix_xml(ui->textEdit->toPlainText());
+    if(new_xml=="")
+    {
+        QMessageBox::information(this,"..","Your Xml has no errors");
+
+
+    }
+    else
+    {
+        ui->textEdit->setText(new_xml);
+        QMessageBox::information(this,"..","One bug solved");
+
+
+
+
+    }
+
+
+
+
+
 
 }
 

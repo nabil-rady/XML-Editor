@@ -1,25 +1,81 @@
 #include "fix_xml.hpp"
+#include "QMessageBox"
 
-QString fix_xml(QString xml){
-//    if (check(xml)){
-//        return xml;
-//    }
+QString fix_xml(QString text){
+    int startindex, endindex, openingtags, closingtags, selfclosingtags;
+        QString expected;
+        check_with_counting(text, &startindex, &endindex, &openingtags, &closingtags, &selfclosingtags,&expected);
+       if (openingtags>closingtags)
+        {
+           if (startindex==0)
+           {
+               return text + "</" + text.mid(startindex + 1, endindex - startindex-2) + ">";
 
-    QString ans = "";
-    long long len = xml.length();
-    for (long long i = 0; i < len; i++){
+           }
 
-    }
-    return ans;
+
+            int index = startindex;
+            while (1)
+            {
+                while (text[index] != '>')
+                {
+                    index--;
+
+                }
+                int maybeclosingtag = index - 1;
+                while (text[index] != '<')
+                {
+                    if (text[index]==' ')
+                    {
+                         maybeclosingtag = index - 1;
+
+                    }
+                    index--;
+                }
+                int maybeopeningtag = index + 1;
+
+
+                QString maybetag = text.mid(maybeopeningtag,( maybeclosingtag-maybeopeningtag)+1);
+                if (maybetag==expected)
+                {
+                    index++;
+                    while (text[index] != '<')
+                    {
+
+                        index++;
+
+                    }
+                    return text.mid(0, index) + "</" + expected + ">" + text.mid(index, text.length() - index);
+
+
+
+                }
+            }
+
+        }
+
+
+
+
+
+       return "";
+
+
+
+
+
+
+
 }
 
 
 
 
 
-
-bool check_with_counting(QString file, int* startindex, int* endindex, int* openingtag, int* closingtag, int* selfclosingtag)
+bool check_with_counting(QString file, int* startindex, int* endindex, int* openingtag, int* closingtag, int* selfclosingtag, QString* expected)
 {
+    *startindex = 0;
+    *endindex = 0;
     *openingtag =0 ;
     *closingtag =0 ;
     *selfclosingtag = 0;
@@ -72,9 +128,10 @@ bool check_with_counting(QString file, int* startindex, int* endindex, int* open
                 {
                     int end = i;
                     //                QString tag = file.substr(start, end - start);
-                   QString tag = file.mid(start, end - start);
+                    QString tag = file.mid(start, end - start);
                     //                qDebug() << tag;
                     checking.push(tag);
+
                     starting.push(start);
                     ending.push(end);
                     *openingtag+=1;
@@ -152,9 +209,17 @@ bool check_with_counting(QString file, int* startindex, int* endindex, int* open
                 else
                 {
                     closing.push(tag);
+                    if (!checking.empty())
+                    {
+                        *expected = checking.top();
+
+
+                    }
+
 
                     if (*startindex == 0)
                     {
+
                         *startindex = start - 2;
                         *endindex = end + 1;
 
@@ -200,4 +265,5 @@ bool check_with_counting(QString file, int* startindex, int* endindex, int* open
 
 
 }
+
 
