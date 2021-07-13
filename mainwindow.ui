@@ -45,6 +45,7 @@
     <addaction name="actionSolve_Errors"/>
     <addaction name="actionCopress_XML_File"/>
     <addaction name="actionDecompress"/>
+    <addaction name="actionMinify"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -85,6 +86,7 @@
    <addaction name="actionCheck_Consistency"/>
    <addaction name="actionCopress_XML_File"/>
    <addaction name="actionDecompress"/>
+   <addaction name="actionMinify"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -222,6 +224,15 @@
    </property>
    <property name="text">
     <string>Decompress</string>
+   </property>
+  </action>
+  <action name="actionMinify">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new/prefix1/images.jfif</normaloff>:/new/prefix1/images.jfif</iconset>
+   </property>
+   <property name="text">
+    <string>Minify</string>
    </property>
   </action>
  </widget>
