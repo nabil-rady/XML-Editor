@@ -7,7 +7,7 @@
 #include <QPlainTextEdit>
 #include "lib/Graph.hpp"
 #include "lib/check.hpp"
-
+#include <QColor>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -30,6 +30,7 @@ void MainWindow::on_actionQuit_triggered()
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
 QString fileloc="";
+std::vector <std::string> lines;
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
@@ -44,12 +45,9 @@ void MainWindow::on_actionOpen_XML_File_triggered()
     QString text = in.readAll();
     ui->textEdit->setText(text);
     file.close();
-
-
 }
 void MainWindow::on_actionSave_triggered()
 {
-
     QString fileName = QFileDialog::getSaveFileName(this,
              tr("Save Address Book"), "",
              tr("Address Book (*.xml);;Address Book (*.json);;All Files (*)"));
@@ -65,150 +63,36 @@ void MainWindow::on_actionSave_triggered()
     file.flush();
     file.close();
 
-
-}
-
-
-
-
-
-
-
-
-bool MainWindow::save()
-{
-    if (curFile.isEmpty()) {
-        return saveAs();
-    } else {
-        return saveFile(curFile);
-    }
-}
-bool MainWindow::saveAs()
-{
-    QFileDialog dialog(this);
-    dialog.setWindowModality(Qt::WindowModal);
-    dialog.setAcceptMode(QFileDialog::AcceptSave);
-    dialog.setDefaultSuffix("*.xml") ;
-    if (dialog.exec() != QDialog::Accepted)
-        return false;
-    return saveFile(dialog.selectedFiles().first());
-}
-bool MainWindow::maybeSave()
-{
-    if (!textEdit->document()->isModified())
-        return true;
-    const QMessageBox::StandardButton ret
-        = QMessageBox::warning(this, tr("Application"),
-                               tr("The document has been modified.\n"
-                                  "Do you want to save your changes?"),
-                               QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
-    switch (ret) {
-    case QMessageBox::Save:
-        //return save();
-    case QMessageBox::Cancel:
-        return false;
-    default:
-        break;
-    }
-    return true;
-}
-bool MainWindow::saveFile(const QString &fileName)
-{
-    QString errorMessage;
-
-    QGuiApplication::setOverrideCursor(Qt::WaitCursor);
-    QSaveFile file(fileName);
-    if (file.open(QFile::WriteOnly | QFile::Text)) {
-        QTextStream out(&file);
-        out << textEdit->toPlainText();
-        if (!file.commit()) {
-            errorMessage = tr("Cannot write file %1:\n%2.")
-                           .arg(QDir::toNativeSeparators(fileName), file.errorString());
-        }
-    } else {
-        errorMessage = tr("Cannot open file %1 for writing:\n%2.")
-                       .arg(QDir::toNativeSeparators(fileName), file.errorString());
-    }
-    QGuiApplication::restoreOverrideCursor();
-
-    if (!errorMessage.isEmpty()) {
-        QMessageBox::warning(this, tr("Application"), errorMessage);
-        return false;
-    }
-
-    setCurrentFile(fileName);
-    statusBar()->showMessage(tr("File saved"), 2000);
-    return true;
-}
-void MainWindow::setCurrentFile(const QString &fileName)
-{
-    curFile = fileName;
-    textEdit->document()->setModified(false);
-    setWindowModified(false);
-
-    QString shownName = curFile;
-    if (curFile.isEmpty())
-        shownName = "untitled.txt";
-    setWindowFilePath(shownName);
 }
 void MainWindow::on_actionConvert_To_JSON_triggered()
 {
-    ui->textEdit->clear();
-    //QString text= textEdit->toPlainText();
-    QFile file(fileloc);
-    if (!file.open(QFile::ReadOnly|QFile::Text))
-    {
-        QMessageBox::warning(this,"..","can not open the file");
-        return ;
-    }
-    QTextStream in(&file);
-    QString text = in.readAll();
-    //ui->textEdit->setText(text);
-    //QTextStream text(&file);
-    //QString textfile = text.readAll();
     int start;
     int end;
 
-    if (check(text,&start,&end))
+    if (check(ui->textEdit->toPlainText(),&start,&end))
     {
-    Graph t = build_tree(text);
+    Graph t = build_tree(ui->textEdit->toPlainText());
     QString Json_Output=t.convert_to_json();
     ui->textEdit->setText(Json_Output);
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
-
-
-
 }
 
 
 void MainWindow::on_actionBeautify_triggered()
 {
-    ui->textEdit->clear();
-    //QString text= textEdit->toPlainText();
-    QFile file(fileloc);
-    if (!file.open(QFile::ReadOnly|QFile::Text))
-    {
-        QMessageBox::warning(this,"..","can not open the file");
-        return ;
-    }
-    QTextStream in(&file);
-    QString text = in.readAll();
     int start;
     int end;
 
-    if(check(text,&start,&end))
+    if (check(ui->textEdit->toPlainText(),&start,&end))
     {
-    //ui->textEdit->setText(text);
-    //QTextStream text(&file);
-    //QString textfile = text.readAll();
-    Graph t = build_tree(text);
-    QString Beautify_Output=t.beautify_xml();
-    ui->textEdit->setText(Beautify_Output);
+    Graph t = build_tree(ui->textEdit->toPlainText());
+    QString Json_Output=t.beautify_xml();
+    ui->textEdit->setText(Json_Output);
     }
     else
-        QMessageBox::warning(this,"..","Your xml is not consistent");
+        QMessageBox::warning(this,"..","the xml is not consistent");
 }
 
 
@@ -238,6 +122,7 @@ void MainWindow::on_actionRedo_triggered()
 
 void MainWindow::on_actionCheck_Consistency_triggered()
 {
+    ui->textEdit->clear();
     QFile file(fileloc);
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
@@ -246,17 +131,34 @@ void MainWindow::on_actionCheck_Consistency_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
-    int start,end;
-    if (check(text,&start,&end))
+    int start=0,end=text.length()-1;
+    QString before_error="";
+    QString after_error="";
+    QString error="";
+    QString notmodified="";
+    check(text,&start,&end);
+    for (int i=0;i<text.length();i++)
     {
-        QMessageBox::information(this,"","No errors found");
-
+        if (i<start)
+        {
+            before_error+=text[i];
+        }
+        if (i>=start&&i<=end-1)
+        {
+            error+=text[i];
+        }
+        if (i>end-1)
+            after_error+=text[i];
     }
-    else
-        QMessageBox::warning(this,"..","Your xml is not consistent");
-
-    return;
-
+    ui->textEdit->setTextColor( QColor( "black" ) );
+    ui->textEdit->append(before_error);
+    ui->textEdit->setTextColor( QColor( "red" ) );
+    ui->textEdit->append(error);
+    if (end !=text.length()-1)
+    {
+        ui->textEdit->setTextColor( QColor( "black" ) );
+        ui->textEdit->append(after_error);
+    }
 }
 
 
@@ -265,3 +167,51 @@ void MainWindow::on_actionSolve_Errors_triggered()
 
 }
 
+
+void MainWindow::on_actionCopress_XML_File_triggered()
+{
+    QFile file(fileloc);
+    if (!file.open(QFile::ReadOnly|QFile::Text))
+    {
+        QMessageBox::warning(this,"..","can not open the file");
+        return ;
+    }
+    QTextStream in(&file);
+    QString text = in.readAll();
+    QByteArray compressed=compress(text);
+    QString fileName = QFileDialog::getSaveFileName(this,
+             tr("Save Address Book"), "",
+             tr("Address Book (*.zxml);;All Files (*)"));
+    QFile newDoc(fileName);
+    if(newDoc.open(QIODevice::WriteOnly)){
+        newDoc.write(compressed);
+    }
+
+    newDoc.close();
+}
+
+
+void MainWindow::on_actionDecompress_triggered()
+{
+    QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.zxml)")));
+        char file_data;
+        QByteArray arr;
+        if(!file.open(QFile::ReadOnly))
+        {
+            qDebug() << " Could not open the file for reading";
+            return;
+        }
+
+        while(!file.atEnd())
+        {
+          // return value from 'file.read' should always be sizeof(char).
+          file.read(&file_data,sizeof(char));
+          arr.push_back(file_data);
+          // do something with 'file_data'.
+
+        }
+        file.close();
+    QString txt = decompress(arr);
+    ui->textEdit->clear();
+    ui->textEdit->setText(txt);
+}
