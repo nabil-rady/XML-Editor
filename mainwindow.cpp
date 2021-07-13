@@ -84,7 +84,10 @@ void MainWindow::on_actionBeautify_triggered()
 {
     int start;
     int end;
-
+    if (ui->textEdit->toPlainText()[0]=='{')
+        QMessageBox::warning(this,"..","Error Cannot beautify jason file");
+    else
+    {
     if (check(ui->textEdit->toPlainText(),&start,&end))
     {
     Graph t = build_tree(ui->textEdit->toPlainText());
@@ -93,6 +96,7 @@ void MainWindow::on_actionBeautify_triggered()
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
+    }
 }
 
 
