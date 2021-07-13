@@ -291,8 +291,8 @@ Graph build_tree(QString xml_file) {
 
     long long len = xml_file.length();
     for (long long i = 0; i < len;) {
-        // ignore white spaces and meainingless words
-        while (xml_file[i] != '<') {
+        // ignore white spaces
+        while (xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f') {
             if (i < len - 1)
                 i++;
             else {
@@ -300,6 +300,10 @@ Graph build_tree(QString xml_file) {
                 end = true;
                 break;
             }
+        }
+        if (xml_file[i] != '<'){
+            i++;
+            continue;
         }
 
         // ignore comments and headings
@@ -413,17 +417,6 @@ Graph build_tree(QString xml_file) {
             // pop if it's not poped at the value step
             if (closed_tag == tags.top()->name)
                 tags.pop();
-
-            // ignore white spaces and meainingless words
-            while (xml_file[i] != '<') {
-                if (i < len - 1)
-                    i++;
-                else {
-                    // throw EOF
-                    end = true;
-                    break;
-                }
-            }
         }
 
         // if white spaces to the end of the file
