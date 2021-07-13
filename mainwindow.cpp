@@ -249,7 +249,7 @@ void MainWindow::on_actionCheck_Consistency_triggered()
     int start,end;
     if (check(text,&start,&end))
     {
-        QMessageBox::information(this,"..","No errors found");
+        QMessageBox::information(this,"","No errors found");
 
     }
     else
