@@ -132,72 +132,33 @@ void MainWindow::on_actionCheck_Consistency_triggered()
     QTextStream in(&file);
     QString text = in.readAll();
     int start=0,end=text.length()-1;
+    QString before_error="";
+    QString after_error="";
     QString error="";
     QString notmodified="";
-//    QTextCharFormat format;
-//    QTextCursor cursor( ui->textEdit->textCursor() );
-    //std::string line;
     check(text,&start,&end);
     for (int i=0;i<text.length();i++)
     {
-        notmodified+=text[i];
         if (i<start)
         {
-            ui->textEdit->setTextColor( QColor( "black" ) );
-            ui->textEdit->append(notmodified);
+            before_error+=text[i];
         }
-        if (i>=start&&i<=end)
+        if (i>=start&&i<=end-1)
         {
             error+=text[i];
-            if (i==end)
-            {
-                ui->textEdit->setTextColor( QColor( "red" ) );
-                ui->textEdit->append(error);
-            }
         }
+        if (i>end-1)
+            after_error+=text[i];
     }
-//    if(check(text,&start,&end))
-//    {
-//     QMessageBox enteredString;
-//     enteredString.setText("Correct XML File");
-//     enteredString.exec();
-//    }
-//    else
-//    {int j =0;
-//      for (int i=1;i<text.size()+1;i++)
-//      {
-//          //line=lines[i-1];
-//          if(i == start)
-//          {
-//              format.setFontWeight( QFont::TypeWriter );
-//              format.setForeground( QBrush( QColor(Qt::red) ) );
-//              cursor.setCharFormat( format );
-//              cursor.insertText(QString::fromStdString(line));
-//              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
-//              //j++;
-//          }
-//          else
-//          {
-//              format.setFontWeight( QFont::TypeWriter );
-//              format.setForeground( QBrush( QColor(Qt::black) ) );
-//              cursor.setCharFormat( format );
-//              cursor.insertText(QString::fromStdString(line));
-//              if(cursor.PreviousCharacter != '\n'){cursor.insertText("\n");}
-//          }
-//      }
-//    }
-//    if (check(text,&start,&end))
-//    {
-//        QMessageBox::information(this,"..","No errors found");
-
-//    }
-//    else
-//    {
-//        QString test =text.mid(start, end - start);
-//        test.setTextColor("QLineEdit { background-color: yellow }");
-//    }
-
-
+    ui->textEdit->setTextColor( QColor( "black" ) );
+    ui->textEdit->append(before_error);
+    ui->textEdit->setTextColor( QColor( "red" ) );
+    ui->textEdit->append(error);
+    if (end !=text.length()-1)
+    {
+        ui->textEdit->setTextColor( QColor( "black" ) );
+        ui->textEdit->append(after_error);
+    }
 }
 
 
@@ -221,7 +182,6 @@ void MainWindow::on_actionCopress_XML_File_triggered()
     QString fileName = QFileDialog::getSaveFileName(this,
              tr("Save Address Book"), "",
              tr("Address Book (*.zxml);;All Files (*)"));
-    //QFile newDoc("C:/Users/HP/Desktop");
     QFile newDoc(fileName);
     if(newDoc.open(QIODevice::WriteOnly)){
         newDoc.write(compressed);
@@ -254,13 +214,4 @@ void MainWindow::on_actionDecompress_triggered()
     QString txt = decompress(arr);
     ui->textEdit->clear();
     ui->textEdit->setText(txt);
-
 }
-
-
-void MainWindow::on_actionColor_triggered()
-{
-    //ui->textEdit->clear();
-    ui->textEdit->setHtml(ui->textEdit->toPlainText());
-}
-

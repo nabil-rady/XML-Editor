@@ -45,7 +45,6 @@
     <addaction name="actionSolve_Errors"/>
     <addaction name="actionCopress_XML_File"/>
     <addaction name="actionDecompress"/>
-    <addaction name="actionColor"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -84,6 +83,8 @@
    <addaction name="actionQuit"/>
    <addaction name="actionSolve_Errors"/>
    <addaction name="actionCheck_Consistency"/>
+   <addaction name="actionCopress_XML_File"/>
+   <addaction name="actionDecompress"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -206,18 +207,21 @@
    </property>
   </action>
   <action name="actionCopress_XML_File">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Compress.ico</normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Compress.ico</iconset>
+   </property>
    <property name="text">
     <string>Copress XML File</string>
    </property>
   </action>
   <action name="actionDecompress">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Server-compress.ico</normaloff>:/new/prefix1/Fatcow-Farm-Fresh-Server-compress.ico</iconset>
+   </property>
    <property name="text">
     <string>Decompress</string>
-   </property>
-  </action>
-  <action name="actionColor">
-   <property name="text">
-    <string>Color</string>
    </property>
   </action>
  </widget>
