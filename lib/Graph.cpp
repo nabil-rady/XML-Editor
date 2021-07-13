@@ -80,171 +80,123 @@ void Graph::print() {
     qDebug() << '\n';
 }
 
-/*
-{
-    "name": "mohamed",
-    "hobbies": {
-        "swimming": "true"
-    }
-}
-*/
-
-//QString Graph::_convert_to_json(Node* node, QString& json ,QHash<Node*, bool>& visited, int level, bool last){
-//    QString tab = "";
-//    for(int i = 0; i < level; i++)
-//        tab+='\t';
-//    if (this->adj.find(node) == this->adj.end() || !this->adj[node]){ // leaf node
-//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("\"") + node->value + QString("\",\n");
-//    } else {
-//        json = json + tab + QString("\"") + node->name + QString("\"") + QString(": ")+ QString("{\n");
-//    }
-
-//    visited[node] = true;
-//    if(this->adj[node]){
-//        for(auto it = this->adj[node]->begin(); it != this->adj[node]->end(); it++){
-//            if(visited.find(*it) == visited.end()){
-//                if (it + 1 == this->adj[node]->end() && this->adj[node]->size() != 1 ) // Last and not the only one
-//                    this->_convert_to_json(*it, json, visited, level+1, true);
-//                else
-//                    this->_convert_to_json(*it, json, visited, level+1, false);
-//            }
-//        }
-//    }
-//    // if last ems7, else mtms74
-//    if (!(this->adj.find(node) == this->adj.end() || !this->adj[node])){ //Not a leaf node
-//        if (last){
-//            json = json.left(json.length()-2);
-//            json += QString("\n") + tab + QString("}\n");
-//        } else {
-//            json += tab + QString("},\n");
-//        }
-//        // if (json[json.length()-2] == ','){
-//        //     json = json.left(json.length()-2);
-//        //     json += QString("\n") + tab + QString("}\n");
-//        // } else {
-//        //     json += tab + QString("}\n");
-//        // }
-
-//    }
-//    return json;
-//}
-
-
-//QString Graph::convert_to_json(){
-//    QHash<Node*, bool> visited;
-//    QString json = "{\n";
-//    return this->_convert_to_json(this->root, json, visited, 1, true) + QString("}");
-//}
-
-
 void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool array, bool f_arr, bool l_arr) {
     QString t = "    ";
-    if (array && f_arr) {
-        if (s[s.length() - 2] == '{') {
-            s = s.left(s.length() - 2);
+        if (array && f_arr) { // First element in the array
+            if (s[s.length() - 2] == '{') { // this object is converted to array
+                s = s.left(s.length() - 2);
+                tab--;
+            } else if (s[s.length() - 2] == ','){ // if there is no key
+                for (int i = 0; i < tab; i++)
+                    s += t;
+                s += "\"" + QString(node->name) + "\": ";
+            }
+            s += "[\n";
+            tab++;
+            for (int i = 0; i < tab; i++)
+                s += t;
+        } else { // not array or array but not the first element
+            for (int i = 0; i < tab; i++)
+                s += t;
         }
-        s += "[\n";
-        tab++;
-        for (int i = 0; i < tab; i++)
-            s += t;
-    } else {
-        for (int i = 0; i < tab; i++)
-            s += t;
-    }
 
+        if (!array) // the array key should be exists at this point
+            s += "\"" + QString(node->name) + "\": ";
 
-    if (!array) // part of an array and doesn't have value
-        s += "\"" + QString(node->name) + "\": ";
+        if (node->self_closing) { // if self closing tag
+            if (array && l_arr){
+                s += "{}\n";
+                tab--;
+                for (int i = 0; i < tab; i++)
+                    s += t;
+                s += "],\n";
+            } else
+                s += "{},\n";
+            return;
+        } else if (node->value != "") { // if there is a content
+            if (array && l_arr){
+                s += "\"" + QString(node->value) + "\"\n";
+                tab--;
+                for (int i = 0; i < tab; i++)
+                    s += t;
+                s += "],\n";
+            }
+            else
+                s += "\"" + QString(node->value) + "\",\n";
 
+        } else if (this->adj[node]) { // if the node has children
+            tab++;
+            s += "{\n";
+            node->object = true;
+            for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++) {
+                if ((i + 1) == this->adj[node]->end()) { // Last child
+                    if ((i - 1) >= this->adj[node]->begin()) { // Last child isn't the only one
+                        if (( * i)->name == ( * (i - 1))->name) { // same tag as previous one
+                            _convert_to_json( * i, tab, s, true, true, false, true);
+                        }
+                        else
+                            _convert_to_json( * i, tab, s, true, false, false, false);
+                    } else
+                        _convert_to_json( * i, tab, s, true, false, false, false);
+                } else { // Not the last child
+                    if (i == this ->adj[node]->begin()) { // First child
+                        if (( * i)->name == ( * (i + 1))->name) { // Same tag as the next one
+                            node->parent_of_array = true;
+                            node->object = false;
+                            _convert_to_json( * i, tab, s, false, true, true, false);
+                        }
+                        else
+                            _convert_to_json( * i, tab, s, false, false, false, false);
+                    } else { // Not the first
+                        if (( * i)->name == ( * (i + 1))->name && ( * i)->name == ( * (i - 1))->name) { // At the middle of the array
+                            _convert_to_json( * i, tab, s, false, true, false, false);
+                        }
+                        else if (( * i)->name == ( * (i + 1))->name) { // At the begining of the array
+                            // No need to set the node as parent of array as it holds some other children out side the array
+                            _convert_to_json( * i, tab, s, false, true, true, false);
+                        }
+                        else if (( * i)->name == ( * (i - 1))->name) { // At the end of the array
+                            _convert_to_json( * i, tab, s, false, true, false, true);
+                        }
+                        else // Not in array
+                            _convert_to_json( * i, tab, s, false, false, false, false);
+                    }
 
+                }
+            }
 
-    if (node->self_closing) {
-        s += "{},\n";
-        return;
-    } else if (node->value != "") {
-        s += "\"" + QString(node->value) + "\",\n";
-        if (array && l_arr) {
-            if (s[s.length() - 2] == ',') {
+            if (s[s.length() - 2] == ',' && (s[s.length() - 3] != ']' || (s[s.length() - 3] == ']' && node->object))) {
+                // clear the last comma before closing the brackets
                 s = s.left(s.length() - 2);
                 s += "\n";
             }
-            for (int i = 0; i < tab; i++)
-                s += t;
-            s += "]\n";
-            tab--;
-        }
-    } else if (this->adj[node]) {
-        tab++;
-        s += "{\n";
-        for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++) {
-            if ((i + 1) == this->adj[node]->end()) { // Last child
-                if ((i - 1) >= this->adj[node]->begin()) { // Last child isn't the only one
-                    if (( * i)->name == ( * (i - 1))->name) { // same tag as previous one
-                        _convert_to_json( * i, tab, s, true, true, false, true);
-                    }
-                    else
-                        _convert_to_json( * i, tab, s, true, false, false, false);
-                } else
-                    _convert_to_json( * i, tab, s, true, false, false, false);
-            } else { // Not the last child
-                if (i == this ->adj[node]->begin()) { // First child
-                    if (( * i)->name == ( * (i + 1))->name) { // Same tag as the next one
-                        node->parent_of_array = true;
-                        _convert_to_json( * i, tab, s, false, true, true, false);
-                    }
-                    else
-                        _convert_to_json( * i, tab, s, false, false, false, false);
-                } else { // Not the first
-                    if (( * i)->name == ( * (i + 1))->name && ( * i)->name == ( * (i - 1))->name) { // At the middle of the array
-                        _convert_to_json( * i, tab, s, false, true, false, false);
-                    }
-                    else if (( * i)->name == ( * (i + 1))->name) { // At the begining of the array
-                        node->parent_of_array = true;
-                        _convert_to_json( * i, tab, s, false, true, true, false);
-                    }
-                    else if (( * i)->name == ( * (i - 1))->name) { // At the end of the array
-                        _convert_to_json( * i, tab, s, false, true, false, true);
-                    }
-                    else // Not in array
-                        _convert_to_json( * i, tab, s, false, false, false, false);
-                }
 
-            }
-        }
-
-        if (s[s.length() - 2] == ',') {
-            s = s.left(s.length() - 2);
-            s += "\n";
-        } else if (s[s.length() - 2] == ']'){
-            if (!last){
-                s = s.left(s.length() - 1);
-                s += ",\n";
-            }
-        }
-        tab--;
-
-        if (last){
-            if (!node->parent_of_array){
+            if(node->parent_of_array){ // close the square brackets of an array
+                tab--;
                 for (int i = 0; i < tab; i++)
                     s += t;
-                s += "}\n";
-            } else if (s[s.length() - 3] != ']' && s[s.length() - 2] != ']'){
-                    for (int i = 0; i < tab; i++)
-                        s += t;
+
+                if (last){
                     s += "]\n";
-            }
-        } else {
-            if (!node->parent_of_array){
-                for (int i = 0; i < tab; i++)
-                    s += t;
-                s += "},\n";
-            } else if (s[s.length() - 3] != ']' && s[s.length() - 2] != ']'){
-                    for (int i = 0; i < tab; i++)
-                        s += t;
+                } else
                     s += "],\n";
             }
+
+            if (node->object) { // close the curly braces of an object
+                tab--;
+                for (int i = 0; i < tab; i++)
+                    s += t;
+
+                if (node->parent_of_array) {
+                    for (int i = 0; i < tab; i++)
+                        s += t;
+                }
+                if (last) {
+                    s += "}\n";
+                } else
+                    s += "},\n";
+            }
         }
-    }
 }
 
 
