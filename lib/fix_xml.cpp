@@ -4,7 +4,8 @@
 QString fix_xml(QString text){
     int startindex, endindex, openingtags, closingtags, selfclosingtags;
         QString expected;
-        check_with_counting(text, &startindex, &endindex, &openingtags, &closingtags, &selfclosingtags,&expected);
+       if( check_with_counting(text, &startindex, &endindex, &openingtags, &closingtags, &selfclosingtags,&expected))
+           return"";
        if (openingtags>closingtags)
         {
            if (startindex==0)
@@ -58,7 +59,22 @@ QString fix_xml(QString text){
 
 
 
-       return "";
+       if (closingtags>openingtags)
+         {
+             return text.mid(0, startindex)+ text.mid(endindex, text.length() - endindex);
+
+
+
+         }
+         if (closingtags==openingtags)
+         {
+             return text.mid(0, startindex ) + "</" + expected + ">" + text.mid(endindex , text.length() - endindex);
+
+
+         }
+
+
+
 
 
 
