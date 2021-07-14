@@ -30,9 +30,11 @@ void MainWindow::on_actionQuit_triggered()
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
 std::vector <std::string> lines;
+QString fileloc="";
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
+    fileloc=file.fileName();
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
         QMessageBox::warning(this,"..","can not open the file");
