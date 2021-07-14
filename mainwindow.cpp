@@ -42,6 +42,7 @@ void MainWindow::on_actionOpen_XML_File_triggered()
     }
     QTextStream in(&file);
     QString text = in.readAll();
+    ui->textEdit->setTextColor( QColor( "black" ) );
     ui->textEdit->setText(text);
     file.close();
 }
@@ -74,6 +75,7 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
         {
             Graph t = build_tree(ui->textEdit->toPlainText());
             QString Json_Output=t.convert_to_json();
+            ui->textEdit->setTextColor( QColor( "black" ) );
             ui->textEdit->setText(Json_Output);
         }
         else
@@ -95,6 +97,7 @@ void MainWindow::on_actionBeautify_triggered()
     {
     Graph t = build_tree(ui->textEdit->toPlainText());
     QString beautify_Output=t.beautify_xml();
+    ui->textEdit->setTextColor( QColor( "black" ) );
     ui->textEdit->setText(beautify_Output);
     }
     else
@@ -232,6 +235,7 @@ void MainWindow::on_actionDecompress_triggered()
         file.close();
     QString txt = decompress(arr);
     ui->textEdit->clear();
+    ui->textEdit->setTextColor( QColor( "black" ) );
     ui->textEdit->setText(txt);
 }
 
@@ -244,6 +248,7 @@ void MainWindow::on_actionMinify_triggered()
     {
     //Graph t = build_tree(ui->textEdit->toPlainText());
     QString minify_Output=minify(ui->textEdit->toPlainText());
+     ui->textEdit->setTextColor( QColor( "black" ) );
     ui->textEdit->setText(minify_Output);
     }
     else
