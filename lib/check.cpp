@@ -1,24 +1,13 @@
 #include "check.hpp"
 #include <QDebug>
-
-
-
 bool check(QString file,int *startindex,int *endindex)
 {
     *startindex=0;
     *endindex=0;
-
-
 	QStack<QString> checking;
 	QStack<QString> closing;
     QStack<int> starting;
-
     QStack<int> ending;
-
-
-
-	
-	
 	int len=file.length();
 	for (int i = 0; i < len; i++)
 	{
@@ -27,21 +16,14 @@ bool check(QString file,int *startindex,int *endindex)
             if (file[i + 1] == '?')
             {
                 while (file[i]!='>')
-                {
-                    i++;
-
-                }
+                {i++;}
                 continue;
-
             }
             if (file[i + 1] == '!'&&file[i + 2] == '-')
             {
                 while(file[i] != '>')
                     i++;
                 continue;
-
-
-
             }
 			if (file[i + 1] != '/')
 			{
@@ -54,19 +36,13 @@ bool check(QString file,int *startindex,int *endindex)
                                        {
                                            *startindex = start - 1;
                                            *endindex = len - 1;
-
                                            return false;
-
                                        }
-
-
 				}
                 if(file[i]==' ')
                 {
                     int end = i;
-    //                QString tag = file.substr(start, end - start);
                     QString tag = file.mid(start, end - start);
-    //                qDebug() << tag;
                     checking.push(tag);
                     starting.push(start);
                     ending.push(end);
@@ -76,28 +52,19 @@ bool check(QString file,int *startindex,int *endindex)
                                            {
                                                *startindex = start - 1;
                                                *endindex = end+1;
-
                                                return false;
-
                                            }
-
                     }
                     if(file[i-1]=='/')
                        { checking.pop();
                         starting.pop();
                         ending.pop();
                     }
-
-
-
                 }
                 else
                 {
-
 				int end = i;
-//                QString tag = file.substr(start, end - start);
                 QString tag = file.mid(start, end - start);
-//                qDebug() << tag;
 				checking.push(tag);
                 starting.push(start);
                 ending.push(end);
@@ -106,11 +73,7 @@ bool check(QString file,int *startindex,int *endindex)
                     starting.pop();
                     ending.pop();
                 }
-
-
                 }
-
-
 			}
 			else
 			{
@@ -122,23 +85,17 @@ bool check(QString file,int *startindex,int *endindex)
                                        {
                                            *startindex = start - 2;
                                            *endindex = len - 1;
-
                                            return false;
-
                                        }
 
 				}
 				int end = i;
-//                QString tag = file.subString(start, end - start);
                 QString tag = file.mid(start, end - start);
-//                qDebug() << tag;
 				if (!checking.empty()&&checking.top()==tag)
 				{
-                    //qDebug().noquote() << checking.top();
 					checking.pop();
                     starting.pop();
                     ending.pop();
-
 				}
 				else
 				{
@@ -147,23 +104,16 @@ bool check(QString file,int *startindex,int *endindex)
                                        {
                                            *startindex = start-2;
                                            *endindex = end+1;
-
                                        }
 					return false;
-
 				}
-
 			}
-			
-
-
 		}
 
 	}
     if (closing.empty() && checking.empty())
        {
            return true;
-
        }
        else
        {
@@ -171,40 +121,12 @@ bool check(QString file,int *startindex,int *endindex)
            {
                *startindex = starting.top()-1;
                    *endindex = ending.top()+1;
-
-
                    return false;
-
            }
            else
            {
-
                return false;
            }
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

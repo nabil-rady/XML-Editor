@@ -27,16 +27,14 @@ void MainWindow::on_actionQuit_triggered()
 {
     QApplication::quit();
 }
-
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
-QString fileloc="";
 std::vector <std::string> lines;
+QString fileloc="";
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
     fileloc=file.fileName();
-    //qDebug()<<fileloc;
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
         QMessageBox::warning(this,"..","can not open the file");
@@ -69,15 +67,19 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
 {
     int start;
     int end;
-
-    if (check(ui->textEdit->toPlainText(),&start,&end))
-    {
-    Graph t = build_tree(ui->textEdit->toPlainText());
-    QString Json_Output=t.convert_to_json();
-    ui->textEdit->setText(Json_Output);
+    if (ui->textEdit->toPlainText()[0]=='{')
+        QMessageBox::warning(this,"..","This is json already!");
+    else {
+        if (check(ui->textEdit->toPlainText(),&start,&end))
+        {
+            Graph t = build_tree(ui->textEdit->toPlainText());
+            QString Json_Output=t.convert_to_json();
+            ui->textEdit->setText(Json_Output);
+        }
+        else
+            QMessageBox::warning(this,"..","the xml is not consistent");
     }
-    else
-        QMessageBox::warning(this,"..","the xml is not consistent");
+
 }
 
 
@@ -85,7 +87,10 @@ void MainWindow::on_actionBeautify_triggered()
 {
     int start;
     int end;
-
+    if (ui->textEdit->toPlainText()[0]=='{')
+        QMessageBox::warning(this,"..","Error Cannot beautify jason file");
+    else
+    {
     if (check(ui->textEdit->toPlainText(),&start,&end))
     {
     Graph t = build_tree(ui->textEdit->toPlainText());
@@ -94,6 +99,7 @@ void MainWindow::on_actionBeautify_triggered()
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
+    }
 }
 
 
@@ -179,17 +185,7 @@ void MainWindow::on_actionSolve_Errors_triggered()
     {
         ui->textEdit->setText(new_xml);
         QMessageBox::information(this,"..","One bug solved");
-
-
-
-
     }
-
-
-
-
-
-
 }
 
 
@@ -223,17 +219,14 @@ void MainWindow::on_actionDecompress_triggered()
         QByteArray arr;
         if(!file.open(QFile::ReadOnly))
         {
-            qDebug() << " Could not open the file for reading";
+            QMessageBox::warning(this,"..","can not open the file");
             return;
         }
 
         while(!file.atEnd())
         {
-          // return value from 'file.read' should always be sizeof(char).
           file.read(&file_data,sizeof(char));
           arr.push_back(file_data);
-          // do something with 'file_data'.
-
         }
         file.close();
     QString txt = decompress(arr);
@@ -249,10 +242,10 @@ void MainWindow::on_actionMinify_triggered()
     if (check(ui->textEdit->toPlainText(),&start,&end))
     {
     //Graph t = build_tree(ui->textEdit->toPlainText());
-    QString Json_Output=minify(ui->textEdit->toPlainText());
-    ui->textEdit->setText(Json_Output);
+    QString minify_Output=minify(ui->textEdit->toPlainText());
+    ui->textEdit->setText(minify_Output);
     }
     else
-        QMessageBox::warning(this,"..","the xml is not consistent");
+        QMessageBox::warning(this,"..","The xml file is not consistent");
 }
 
