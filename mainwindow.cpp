@@ -27,16 +27,12 @@ void MainWindow::on_actionQuit_triggered()
 {
     QApplication::quit();
 }
-
 QFile XMLtemp("out.txt");
 QFile XMLfile("myfile.txt");
-QString fileloc="";
 std::vector <std::string> lines;
 void MainWindow::on_actionOpen_XML_File_triggered()
 {
     QFile file(QFileDialog::getOpenFileName(this, tr("Open File"), QString(),tr("Text Files (*.xml)")));
-    fileloc=file.fileName();
-    //qDebug()<<fileloc;
     if (!file.open(QFile::ReadOnly|QFile::Text))
     {
         QMessageBox::warning(this,"..","can not open the file");
@@ -183,17 +179,7 @@ void MainWindow::on_actionSolve_Errors_triggered()
     {
         ui->textEdit->setText(new_xml);
         QMessageBox::information(this,"..","One bug solved");
-
-
-
-
     }
-
-
-
-
-
-
 }
 
 
@@ -227,7 +213,7 @@ void MainWindow::on_actionDecompress_triggered()
         QByteArray arr;
         if(!file.open(QFile::ReadOnly))
         {
-            qDebug() << " Could not open the file for reading";
+            QMessageBox::warning(this,"..","can not open the file");
             return;
         }
 
@@ -253,8 +239,8 @@ void MainWindow::on_actionMinify_triggered()
     if (check(ui->textEdit->toPlainText(),&start,&end))
     {
     //Graph t = build_tree(ui->textEdit->toPlainText());
-    QString Json_Output=minify(ui->textEdit->toPlainText());
-    ui->textEdit->setText(Json_Output);
+    QString minify_Output=minify(ui->textEdit->toPlainText());
+    ui->textEdit->setText(minify_Output);
     }
     else
         QMessageBox::warning(this,"..","the xml is not consistent");
