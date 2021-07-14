@@ -67,15 +67,19 @@ void MainWindow::on_actionConvert_To_JSON_triggered()
 {
     int start;
     int end;
-
-    if (check(ui->textEdit->toPlainText(),&start,&end))
-    {
-    Graph t = build_tree(ui->textEdit->toPlainText());
-    QString Json_Output=t.convert_to_json();
-    ui->textEdit->setText(Json_Output);
+    if (ui->textEdit->toPlainText()[0]=='{')
+        QMessageBox::warning(this,"..","This is json already!");
+    else {
+        if (check(ui->textEdit->toPlainText(),&start,&end))
+        {
+            Graph t = build_tree(ui->textEdit->toPlainText());
+            QString Json_Output=t.convert_to_json();
+            ui->textEdit->setText(Json_Output);
+        }
+        else
+            QMessageBox::warning(this,"..","the xml is not consistent");
     }
-    else
-        QMessageBox::warning(this,"..","the xml is not consistent");
+
 }
 
 

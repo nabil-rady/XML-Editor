@@ -311,15 +311,21 @@ Graph build_tree(QString xml_file) {
             if (xml_file[i + 1] == '?'){
                 if (i == 0)
                     i++;
-                while (xml_file[i] != '>' && xml_file[i-1] != '?'){
+                while (1){
+                    if(xml_file[i] == '>' && xml_file[i-1] == '?'){
+                        break;
+                    }
                     i++;
                 }
                 if (xml_file[i] == '>')
                     i++;
             } else if(xml_file[i + 1] == '!'){
-                if (i == 0)
+                while (i < 2)
                     i++;
-                while (xml_file[i] != '>' && xml_file[i-1] != '-' && xml_file[i-2] != '-'){
+                while (1){
+                    if (xml_file[i] == '>' && xml_file[i-1] == '-' && xml_file[i-2] == '-'){
+                        break;
+                    }
                     i++;
                 }
                 if (xml_file[i] == '>')
