@@ -46,5 +46,4 @@ QString minify(QString file);
 Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator look_ahead_buffer);
 QByteArray compress(QString& file);
 QString decompress(QByteArray& compressed_byte_array);
-void attributes(QString& s, Node* node, int& tab);
 

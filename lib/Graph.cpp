@@ -82,36 +82,6 @@ void Graph::print() {
     qDebug() << '\n';
 }
 
-void attributes(QString& s, Node* node, int& tab){
-    QString t = "    ";
-    QString properties = node->properties;
-    s += "{\n";
-    tab++;
-
-    for (int i = 0; i < properties.length(); i++){
-        if (i < properties.length() - 2 && properties[i] == ' '){
-            i++;
-            for (int i = 0; i < tab; i++)
-                s += t;
-            s += "\"@";
-            while(properties[i] != '=')
-                s += properties[i++];
-
-            if(properties[i] == '='){
-                i += 2;
-                s += "\": \"";
-            }
-
-            while(properties[i] != '\"')
-                s += properties[i++];
-
-            if(properties[i] == '\"'){
-                s += "\",\n";
-            }
-        }
-    }
-}
-
 void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool array, bool f_arr, bool l_arr) {
     QString t = "    ";
     if (array && f_arr) { // First element in the array
