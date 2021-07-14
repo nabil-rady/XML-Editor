@@ -10,6 +10,8 @@ struct Node{
     QString properties;
     bool self_closing;
     bool parent_of_array;
+    bool array_of_leaf_nodes;
+    bool oppened;
     bool object;
     Node(QString name, QString value, QString properties, bool self_closing);
 };
@@ -44,5 +46,5 @@ QString minify(QString file);
 Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator look_ahead_buffer);
 QByteArray compress(QString& file);
 QString decompress(QByteArray& compressed_byte_array);
-
+void attributes(QString& s, Node* node, int& tab);
 
