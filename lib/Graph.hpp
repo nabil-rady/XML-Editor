@@ -31,7 +31,7 @@ public:
     Graph();
     ~Graph();
     Node* get_root();
-    void add_edge(Node* from, Node* to); //
+    void add_edge(Node* from, Node* to);
     void print();
     QString _convert_to_json(Node* node,QString& json ,QHash<Node*, bool>& visited, int level, bool);
     QString convert_to_json();

@@ -55,39 +55,15 @@ QString fix_xml(QString text){
 
         }
 
-
-
-
-
        if (closingtags>openingtags)
          {
              return text.mid(0, startindex)+ text.mid(endindex, text.length() - endindex);
-
-
-
          }
          if (closingtags==openingtags)
          {
              return text.mid(0, startindex ) + "</" + expected + ">" + text.mid(endindex , text.length() - endindex);
-
-
          }
-
-
-
-
-
-
-
-
-
-
 }
-
-
-
-
-
 bool check_with_counting(QString file, int* startindex, int* endindex, int* openingtag, int* closingtag, int* selfclosingtag, QString* expected)
 {
     *startindex = 0;
@@ -95,17 +71,10 @@ bool check_with_counting(QString file, int* startindex, int* endindex, int* open
     *openingtag =0 ;
     *closingtag =0 ;
     *selfclosingtag = 0;
-
     QStack<QString> checking;
     QStack<QString> closing;
     QStack<int> starting;
-
     QStack<int> ending;
-
-
-
-
-
     int len = file.length();
     for (int i = 0; i < len; i++)
     {
@@ -187,10 +156,7 @@ bool check_with_counting(QString file, int* startindex, int* endindex, int* open
                         ending.pop();
                     }
 
-
                 }
-
-
             }
             else
             {
