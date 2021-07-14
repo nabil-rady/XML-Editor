@@ -12,7 +12,7 @@ Node::Node(QString name, QString value, QString properties, bool self_closing) {
     this->self_closing = self_closing;
     this->parent_of_array = false;
     this->array_of_leaf_nodes = false;
-    this->oppened = false;
+    this->object = false;
 }
 
 Match_Pointer::Match_Pointer(qsizetype begin, qsizetype length){
@@ -105,17 +105,17 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
     if (!array) // the array key should be exists at this point
         s += "\"" + QString(node->name) + "\": ";
 
-    if (node->self_closing) { // if self closing tag
-        if (array && l_arr){
-            s += "{}\n";
-            tab--;
-            for (int i = 0; i < tab; i++)
-                s += t;
-            s += "],\n";
-        } else
-            s += "{},\n";
-        return;
-    } else if (node->value != "") { // if there is a content
+    if (node->self_closing && node->properties.length() == 0) { // if self closing tag with no attributes
+       if (array && l_arr){
+           s += "{}\n";
+           tab--;
+           for (int i = 0; i < tab; i++)
+               s += t;
+           s += "],\n";
+       } else
+           s += "{},\n";
+       return;
+   } else if (node->value != "") { // if there is a content
         if (array && l_arr){
             s += '\"' + QString(node->value) + "\"\n";
             tab--;
@@ -175,7 +175,11 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
             s += "\n";
         }
 
-        if(node->parent_of_array && !node->array_of_leaf_nodes){ // close the square brackets of an array
+        if((node->object && !node->parent_of_array && array && l_arr)){
+            tab--;
+            for (int i = 0; i < tab; i++)
+                s += t;
+            s += "}\n";
             tab--;
             for (int i = 0; i < tab; i++)
                 s += t;
@@ -184,6 +188,20 @@ void Graph::_convert_to_json(Node * node, int& tab, QString & s, bool last, bool
                 s += "]\n";
             } else
                 s += "],\n";
+            return;
+        }
+
+        if(node->parent_of_array && !node->array_of_leaf_nodes){ // close the square brackets of an array
+            if (!(s[s.length() - 2] == ']'|| s[s.length() - 3] == ']')){
+                tab--;
+                for (int i = 0; i < tab; i++)
+                    s += t;
+
+                if (last){
+                    s += "]\n";
+                } else
+                    s += "],\n";
+            }
         }
 
         if (node->object) { // close the curly braces of an object
@@ -211,29 +229,52 @@ QString Graph::convert_to_json() {
     return json;
 }
 
-void Graph::_beautify_xml(Node * node, int tab, QString & s) {
+void Graph::_beautify_xml(Node * node, int& tab, QString& s) {
     QString t = "    ";
-    for (int i = 0; i < tab; i++)
-        s += t;
-    s += "<" + QString(node->name);
+    if (node->name[0] != '#') {
+        for (int i = 0; i < tab; i++)
+            s += t;
+        s += "<" + QString(node->name);
+    }
+
     if (node->properties != "") {
-        s += QString(node->properties) + ">\n";
-        if (node->self_closing)
-            return;
-    } else
+        for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++){
+            if ((*i)->name[0] != '@')
+                break;
+            s += ' ';
+            QString attribute = (*i)->name;
+            QString value = (*i)->value;
+
+            for (int i = 1; i < attribute.length(); i++){
+                s += attribute[i];
+            }
+            s += "=\"" + value + '\"';
+        }
+    }
+
+    if (node->self_closing){
+        s += "/>\n";
+        return;
+    } else if (node->name[0] != '#') {
         s += ">\n";
-    tab++;
+        tab++;
+    }
+
     if (node->value != "") {
         for (int i = 0; i < tab; i++)
             s += t;
         s += QString(node->value) + "\n";
-        tab--;
-        for (int i = 0; i < tab; i++)
-            s += t;
-        s += "</" + QString(node->name) + ">\n";
+        if (node->name[0] != '#') {
+            tab--;
+            for (int i = 0; i < tab; i++)
+                s += t;
+            s += "</" + QString(node->name) + ">\n";
+        }
     } else if (this->adj[node]) {
         for (auto i = this->adj[node]->begin(); i != this->adj[node]->end(); i++) {
-            if ((i + 1) == this-> adj[node]->end())
+            if ((*i)->name[0] == '@')
+                continue;
+            if ((i + 1) == this->adj[node]->end())
                 _beautify_xml( * i, tab, s);
             else
                 _beautify_xml( * i, tab, s);
@@ -242,12 +283,14 @@ void Graph::_beautify_xml(Node * node, int tab, QString & s) {
         for (int i = 0; i < tab; i++)
             s += t;
         s += "</" + QString(node->name) + ">\n";
+
     }
 }
 
 QString Graph::beautify_xml() {
     QString s = "";
-    _beautify_xml(this->root, 0, s);
+    int tab = 0;
+    _beautify_xml(this->root, tab, s);
     return s;
 }
 
@@ -258,9 +301,11 @@ Graph build_tree(QString xml_file) {
     QString tag_value = "";
     QString properties = "";
     bool end = false;
+    Node* parent;
 
     long long len = xml_file.length();
     for (long long i = 0; i < len;) {
+        parent = nullptr;
         // ignore white spaces
         while (xml_file[i] == ' ' || xml_file[i] == '\n' || xml_file[i] == '\t' || xml_file[i] == '\r' || xml_file[i] == '\v' || xml_file[i] == '\f') {
             if (i < len - 1)
@@ -308,7 +353,6 @@ Graph build_tree(QString xml_file) {
             current_tag = QString("");
             tag_value = QString("");
             properties = QString("");
-
             while (xml_file[i] != '>') {
                 if (xml_file[i] == '<') {
                     i++;
@@ -333,7 +377,7 @@ Graph build_tree(QString xml_file) {
                 properties = properties.left(properties.length() - 1);
 
             // add the edges to the graph
-            Node * parent;
+
             if ((properties.length() > 0) && (properties[properties.length() - 1] == '/'))
                 parent = new Node(current_tag.trimmed(), QString(""), properties, true);
             else
@@ -367,7 +411,7 @@ Graph build_tree(QString xml_file) {
                 while ((tag_value.length() > 0) && (tag_value[tag_value.length() - 1] == '\n' || tag_value[tag_value.length() - 1] == '\t' || tag_value[tag_value.length() - 1] == ' '))
                     tag_value = tag_value.left(tag_value.length() - 1);
 
-                Node * child = tags.top();
+                Node* child = tags.top();
                 child->value = tag_value;
 
                 tags.pop(); // after the content, the closed tag comes so we will pop
@@ -384,6 +428,34 @@ Graph build_tree(QString xml_file) {
                 }
             }
 
+        }
+
+        // Add attributes as children
+        if (parent && parent->properties.length() > 0){
+            for (int i = 0; i < parent->properties.length(); i++){
+                if (i < parent->properties.length() - 2 && properties[i] == ' '){
+                    QString key = "@";
+                    QString _value = ""; // "id=\"11\" class=\"btngan\" "
+                    i++;
+                    while(properties[i] != '=')
+                        key += properties[i++];
+                    if(properties[i] == '='){
+                        i += 2;
+                    }
+
+                    while(properties[i] != '\"')
+                        _value += properties[i++];
+
+                    Node* attribute = new Node(key, _value, QString(""), false);
+                    tree.add_edge(parent, attribute);
+                }
+            }
+            if (parent->value.length() > 0){
+                QString p_key = '#' + parent->name;
+                Node* p_value = new Node(p_key, parent->value, QString(""), false);
+                tree.add_edge(parent, p_value);
+                parent->value = "";
+            }
         }
 
         // get closing tags
@@ -411,7 +483,6 @@ Graph build_tree(QString xml_file) {
     }
     return tree;
 }
-
 Match_Pointer _largest_match(QByteArray::iterator window, QByteArray::iterator look_ahead_buffer){
     QByteArray::iterator i = window, j = look_ahead_buffer;
     QByteArray longest_match("");
