@@ -309,12 +309,16 @@ Graph build_tree(QString xml_file) {
         // ignore comments and headings
         if (xml_file[i] == '<' && (xml_file[i + 1] == '?' || xml_file[i + 1] == '!')) {
             if (xml_file[i + 1] == '?'){
+                if (i == 0)
+                    i++;
                 while (xml_file[i] != '>' && xml_file[i-1] != '?'){
                     i++;
                 }
                 if (xml_file[i] == '>')
                     i++;
             } else if(xml_file[i + 1] == '!'){
+                if (i == 0)
+                    i++;
                 while (xml_file[i] != '>' && xml_file[i-1] != '-' && xml_file[i-2] != '-'){
                     i++;
                 }
@@ -378,6 +382,10 @@ Graph build_tree(QString xml_file) {
             // get the tag value
             if (xml_file[i] != '<') {
                 while (xml_file[i] != '<') {
+                    if (xml_file[i] == '\"'){
+                        i++;
+                        continue;
+                    }
                     tag_value += xml_file[i++];
                 }
                 while ((tag_value.length() > 0) && (tag_value[tag_value.length() - 1] == '\n' || tag_value[tag_value.length() - 1] == '\t' || tag_value[tag_value.length() - 1] == ' '))
