@@ -183,6 +183,7 @@ void MainWindow::on_actionSolve_Errors_triggered()
     }
     else
     {
+        ui->textEdit->setTextColor( QColor( "black" ) );
         ui->textEdit->setText(new_xml);
         QMessageBox::information(this,"..","One bug solved");
     }
