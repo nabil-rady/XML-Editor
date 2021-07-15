@@ -46,6 +46,7 @@
     <addaction name="actionCopress_XML_File"/>
     <addaction name="actionDecompress"/>
     <addaction name="actionMinify"/>
+    <addaction name="actionClear_Window"/>
    </widget>
    <widget class="QMenu" name="menuEdit">
     <property name="title">
@@ -87,6 +88,7 @@
    <addaction name="actionCopress_XML_File"/>
    <addaction name="actionDecompress"/>
    <addaction name="actionMinify"/>
+   <addaction name="actionClear_Window"/>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -233,6 +235,15 @@
    </property>
    <property name="text">
     <string>Minify</string>
+   </property>
+  </action>
+  <action name="actionClear_Window">
+   <property name="icon">
+    <iconset resource="resource.qrc">
+     <normaloff>:/new/prefix1/Seanau-Email-Clear.ico</normaloff>:/new/prefix1/Seanau-Email-Clear.ico</iconset>
+   </property>
+   <property name="text">
+    <string>Clear Window</string>
    </property>
   </action>
  </widget>

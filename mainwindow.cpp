@@ -255,3 +255,9 @@ void MainWindow::on_actionMinify_triggered()
         QMessageBox::warning(this,"..","The xml file is not consistent");
 }
 
+
+void MainWindow::on_actionClear_Window_triggered()
+{
+    ui->textEdit->clear();
+}
+
