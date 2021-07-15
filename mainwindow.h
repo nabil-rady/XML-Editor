@@ -36,6 +36,8 @@ private slots:
 
     void on_actionMinify_triggered();
 
+    void on_actionClear_Window_triggered();
+
 private:
     Ui::MainWindow *ui;
     QPlainTextEdit *textEdit;
